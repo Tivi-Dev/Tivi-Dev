@@ -6,7 +6,7 @@ interface Props { title: string; description: string; presentation?: boolean }
 const { title, description, presentation = false } = Astro.props;
 ---
 <!doctype html>
-<html lang="de">
+<html lang="de" class:list={{ 'presentation-page': presentation }}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -15,7 +15,7 @@ const { title, description, presentation = false } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
   </head>
-  <body>
+  <body class:list={{ 'presentation-page': presentation }}>
     <a class="skip-link" href="#inhalt">Zum Inhalt</a>
     <header class="site-header">
       <a class="site-title" href="/">{settings.websiteTitle}</a>

@@ -82,21 +82,48 @@ const { title, description, photo, photoAlt, content } = homepage.data;
 <script>
   const presentation = document.querySelector<HTMLElement>('.presentation');
   if (presentation) {
+    const slides = [...presentation.querySelectorAll<HTMLElement>('.slide')];
+    if (!slides.length) throw new Error('Für den Präsentationsmodus wurden keine Slides gefunden.');
+
     const links = document.querySelectorAll<HTMLAnchorElement>('.site-header nav a');
     const header = document.querySelector<HTMLElement>('.site-header');
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     let frame = 0;
+    let currentIndex = 0;
+    let isNavigating = false;
+    let unlockTimer = 0;
+    let wheelDelta = 0;
+    let wheelResetTimer = 0;
+
+    const getScrollBehavior = (): ScrollBehavior => (reducedMotionQuery.matches ? 'auto' : 'smooth');
     const scrollToSection = (hash: string, behavior: ScrollBehavior) => {
       const section = document.querySelector<HTMLElement>(hash);
       if (!section) return;
       const top = section.getBoundingClientRect().top + window.scrollY - (header?.offsetHeight ?? 0);
       window.scrollTo({ top, behavior });
     };
+    const goToSlide = (targetIndex: number) => {
+      const nextIndex = Math.max(0, Math.min(targetIndex, slides.length - 1));
+      if (nextIndex === currentIndex || isNavigating) return;
+      currentIndex = nextIndex;
+      isNavigating = true;
+      clearTimeout(unlockTimer);
+      scrollToSection(`#${slides[currentIndex].id}`, getScrollBehavior());
+      unlockTimer = window.setTimeout(() => {
+        isNavigating = false;
+        updateActive();
+      }, reducedMotionQuery.matches ? 80 : 650);
+    };
+    const navigateBy = (offset: number) => {
+      goToSlide(currentIndex + offset);
+    };
     const updateActive = () => {
       const top = header?.getBoundingClientRect().bottom ?? 0;
-      const slides = [...presentation.querySelectorAll<HTMLElement>('.slide')];
       const active = slides.reduce((closest, slide) =>
         Math.abs(slide.getBoundingClientRect().top - top) < Math.abs(closest.getBoundingClientRect().top - top) ? slide : closest,
       );
+      const index = slides.indexOf(active);
+      if (index >= 0) currentIndex = index;
       links.forEach(link => {
         if (link.hash === `#${active.id}`) link.setAttribute('aria-current', 'location');
         else link.removeAttribute('aria-current');
@@ -104,16 +131,58 @@ const { title, description, photo, photoAlt, content } = homepage.data;
       if (location.hash !== `#${active.id}`) history.replaceState(null, '', `#${active.id}`);
       frame = 0;
     };
+
+    const onWheel = (event: WheelEvent) => {
+      if (reducedMotionQuery.matches || event.ctrlKey || event.metaKey) return;
+      wheelDelta += event.deltaY;
+      clearTimeout(wheelResetTimer);
+      wheelResetTimer = window.setTimeout(() => { wheelDelta = 0; }, 120);
+      if (Math.abs(wheelDelta) < 80) return;
+      event.preventDefault();
+      navigateBy(wheelDelta > 0 ? 1 : -1);
+      wheelDelta = 0;
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (reducedMotionQuery.matches) return;
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) return;
+
+      if (event.key === 'ArrowDown' || event.key === 'PageDown' || event.key === ' ') {
+        event.preventDefault();
+        navigateBy(1);
+      } else if (event.key === 'ArrowUp' || event.key === 'PageUp') {
+        event.preventDefault();
+        navigateBy(-1);
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        goToSlide(0);
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        goToSlide(slides.length - 1);
+      }
+    };
+
     window.addEventListener('scroll', () => {
       if (!frame) frame = requestAnimationFrame(updateActive);
     }, { passive: true });
+    window.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('keydown', onKeyDown);
+
     links.forEach(link => link.addEventListener('click', event => {
       if (!link.hash) return;
       event.preventDefault();
-      history.replaceState(null, '', link.hash);
-      scrollToSection(link.hash, 'smooth');
+      const targetIndex = slides.findIndex(slide => `#${slide.id}` === link.hash);
+      if (targetIndex >= 0) goToSlide(targetIndex);
     }));
-    if (location.hash) requestAnimationFrame(() => scrollToSection(location.hash, 'auto'));
+
+    if (location.hash) {
+      const targetIndex = slides.findIndex(slide => `#${slide.id}` === location.hash);
+      if (targetIndex >= 0) {
+        currentIndex = targetIndex;
+        requestAnimationFrame(() => scrollToSection(location.hash, 'auto'));
+      }
+    }
     updateActive();
   }
 </script>
