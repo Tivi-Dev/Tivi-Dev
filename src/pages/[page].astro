@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return [
+    { page: 'skills', title: 'Skills' },
+    { page: 'projekte', title: 'Projekte' },
+    { page: 'ueber-mich', title: 'Über Mich' },
+    { page: 'kontakt', title: 'Kontakt' },
+    { page: 'impressum', title: 'Impressum' },
+    { page: 'datenschutz', title: 'Datenschutz' },
+  ].map(({ page, title }) => ({ params: { page }, props: { title } }));
+}
+
+const { title } = Astro.props;
+if (['skills', 'projekte', 'ueber-mich', 'kontakt'].includes(Astro.params.page ?? '')) {
+  return Astro.redirect(`/#${Astro.params.page}`);
+}
+---
+<BaseLayout title={`${title} · Meine Website`} description={`${title} – dieser Bereich entsteht gerade.`}>
+  <section class="hero">
+    <h1>{title}</h1>
+    <p class="intro">Dieser Bereich entsteht gerade.</p>
+  </section>
+</BaseLayout>

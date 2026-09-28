@@ -1,0 +1,20 @@
+{
+  "title": "Tivi-Dev Portfolio",
+  "description": "test",
+  "photo": "/images/homepage/photo.png",
+  "photoAlt": "ich",
+  "content": [
+    {
+      "text": "Sergey",
+      "style": "heading1",
+      "spaceBefore": 0,
+      "spaceAfter": 10
+    },
+    {
+      "text": "Fokin",
+      "style": "heading1",
+      "spaceBefore": 0,
+      "spaceAfter": 16
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+---
+import '@fontsource-variable/manrope';
+import '../styles/global.css';
+import settings from '../content/settings.json';
+interface Props { title: string; description: string; presentation?: boolean }
+const { title, description, presentation = false } = Astro.props;
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#inhalt">Zum Inhalt</a>
+    <header class="site-header">
+      <a class="site-title" href="/">{settings.websiteTitle}</a>
+      <nav class="site-nav" aria-label="Hauptnavigation">
+        <ul>
+          {[
+            { label: 'Home', href: '/#home' },
+            { label: 'Skills', href: '/#skills' },
+            { label: 'Projekte', href: '/#projekte' },
+            { label: 'Über Mich', href: '/#ueber-mich' },
+            { label: 'Kontakt', href: '/#kontakt' },
+          ].map(({ label, href }) => (
+            <li><a href={href} aria-current={Astro.url.pathname.replace(/\/$/, '') === href.replace(/\/$/, '') ? 'page' : undefined}>{label}</a></li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+    <main id="inhalt" class:list={{ presentation }} tabindex={presentation ? 0 : undefined} aria-label={presentation ? 'Home bis Kontakt' : undefined}><slot /></main>
+    <footer class="site-footer">
+      <span class="footer-label">Tivi TM</span>
+      <nav class="site-nav" aria-label="Rechtliche Informationen">
+        <ul>
+          {[
+            { label: 'Impressum', href: '/impressum/' },
+            { label: 'Datenschutz', href: '/datenschutz/' },
+          ].map(({ label, href }) => (
+            <li><a href={href} aria-current={Astro.url.pathname.replace(/\/$/, '') === href.replace(/\/$/, '') ? 'page' : undefined}>{label}</a></li>
+          ))}
+        </ul>
+      </nav>
+    </footer>
+  </body>
+</html>

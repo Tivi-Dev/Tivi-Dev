@@ -1,0 +1,55 @@
+/* Inhaltszeilen-Dialog nach der gewünschten kompakten Editor-Vorlage. */
+[role='dialog'][data-size='medium'] {
+  width: min(1050px, calc(100vw - 48px)) !important;
+  min-height: min(590px, calc(100vh - 48px)) !important;
+  max-width: none !important;
+}
+
+[role='dialog'] [class*='Dialog-grid'] {
+  padding: 44px 58px 32px !important;
+}
+
+[role='dialog'] [class*='Dialog-heading'] {
+  font-size: clamp(2.5rem, 5vw, 3.25rem) !important;
+  font-weight: 400 !important;
+  line-height: 1.05 !important;
+}
+
+[role='dialog'] [role='group'][aria-labelledby] > span:first-child {
+  display: none !important;
+}
+
+[role='dialog'] textarea[data-multiline='true'] {
+  height: 176px !important;
+  min-height: 176px !important;
+  resize: vertical;
+}
+
+[role='dialog'] label {
+  font-size: 1rem !important;
+}
+
+[role='dialog'] [class*='Dialog-button-group'] {
+  margin-top: 36px !important;
+}
+
+[role='dialog'] [class*='Dialog-button-group'] > button:first-child [class*='Button-text'],
+[role='dialog'] [class*='Dialog-button-group'] > button:last-child [class*='Button-text'] {
+  font-size: 0 !important;
+}
+
+[role='dialog'] [class*='Dialog-button-group'] > button:first-child [class*='Button-text']::after {
+  content: 'Abbrechen';
+  font-size: 1rem;
+}
+
+[role='dialog'] [class*='Dialog-button-group'] > button:last-child [class*='Button-text']::after {
+  content: 'Anwenden';
+  font-size: 1rem;
+}
+
+@media (max-width: 760px) {
+  [role='dialog'] [class*='Dialog-grid'] {
+    padding: 28px 24px 24px !important;
+  }
+}

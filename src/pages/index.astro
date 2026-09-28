@@ -1,0 +1,119 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import SkillCard from '../components/SkillCard.astro';
+const homepage = await getEntry('homepage', 'homepage');
+if (!homepage) throw new Error('Die Startseiten-Inhalte fehlen.');
+const cards = await getCollection('cards');
+const { title, description, photo, photoAlt, content } = homepage.data;
+---
+<BaseLayout title={title} description={description} presentation>
+  <section id="home" class="home-split slide" aria-label="Home">
+    <div class="home-text">
+      <div class="prose home-content">
+        {content.map(line => {
+          const className = `home-line home-line--${line.style}`;
+          const style = [
+            `--space-before: ${line.spaceBefore}px`,
+            `--space-after: ${line.spaceAfter}px`,
+            line.fontSize ? `font-size: ${line.fontSize}px` : '',
+            line.bold ? 'font-weight: 800' : '',
+            line.italic ? 'font-style: italic' : '',
+            line.underline ? 'text-decoration: underline' : '',
+          ].filter(Boolean).join('; ');
+          if (line.style === 'heading1') return <h1 class={className} style={style}>{line.text}</h1>;
+          if (line.style === 'heading2') return <h2 class={className} style={style}>{line.text}</h2>;
+          if (line.style === 'heading3') return <h3 class={className} style={style}>{line.text}</h3>;
+          return <p class={className} style={style}>{line.text}</p>;
+        })}
+      </div>
+    </div>
+    <div class="home-photo">
+      {photo ? (
+        <img src={photo} alt={photoAlt ?? ''} width="800" height="1000" fetchpriority="high" />
+      ) : (
+        <div class="photo-placeholder"><span>Dein Foto</span></div>
+      )}
+    </div>
+  </section>
+  <section id="skills" class="slide skills-slide" aria-label="Skills">
+    <section class="skills-area" aria-labelledby="frontend-title">
+      <h2 id="frontend-title">Frontend</h2>
+      <div class="skill-cards">
+        {cards.filter(card => card.data.section === 'frontend').map(card => <SkillCard card={card} />)}
+      </div>
+    </section>
+    <section class="skills-area" aria-labelledby="backend-title">
+      <h2 id="backend-title">Backend</h2>
+      <div class="skill-cards">
+        {cards.filter(card => card.data.section === 'backend').map(card => <SkillCard card={card} />)}
+      </div>
+    </section>
+  </section>
+  <section id="projekte" class="slide text-slide projects-slide" aria-labelledby="projekte-title">
+    <div>
+      <h2 id="projekte-title">Projekte</h2>
+      <div class="project-cards">
+        {cards.filter(card => card.data.section === 'projekte').map(card => <ProjectCard card={card} />)}
+      </div>
+    </div>
+  </section>
+  {[
+    { id: 'ueber-mich', title: 'Über Mich' },
+    { id: 'kontakt', title: 'Kontakt' },
+  ].map(({ id, title }) => (
+    <section id={id} class="slide text-slide" aria-labelledby={`${id}-title`}>
+      <div>
+        <h2 id={`${id}-title`}>{title}</h2>
+        <p class="intro">Dieser Bereich entsteht gerade.</p>
+        <div class="card-grid">
+          {cards.filter((card) => card.data.section === id).map((card) => <article class="content-card">
+            {card.data.image && <img src={card.data.image} alt={card.data.imageAlt ?? ''} loading="lazy" />}
+            <h3>{card.data.title}</h3>
+            {card.data.description && <p>{card.data.description}</p>}
+          </article>)}
+        </div>
+      </div>
+    </section>
+  ))}
+</BaseLayout>
+
+<script>
+  const presentation = document.querySelector<HTMLElement>('.presentation');
+  if (presentation) {
+    const links = document.querySelectorAll<HTMLAnchorElement>('.site-header nav a');
+    const header = document.querySelector<HTMLElement>('.site-header');
+    let frame = 0;
+    const scrollToSection = (hash: string, behavior: ScrollBehavior) => {
+      const section = document.querySelector<HTMLElement>(hash);
+      if (!section) return;
+      const top = section.getBoundingClientRect().top + window.scrollY - (header?.offsetHeight ?? 0);
+      window.scrollTo({ top, behavior });
+    };
+    const updateActive = () => {
+      const top = header?.getBoundingClientRect().bottom ?? 0;
+      const slides = [...presentation.querySelectorAll<HTMLElement>('.slide')];
+      const active = slides.reduce((closest, slide) =>
+        Math.abs(slide.getBoundingClientRect().top - top) < Math.abs(closest.getBoundingClientRect().top - top) ? slide : closest,
+      );
+      links.forEach(link => {
+        if (link.hash === `#${active.id}`) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+      if (location.hash !== `#${active.id}`) history.replaceState(null, '', `#${active.id}`);
+      frame = 0;
+    };
+    window.addEventListener('scroll', () => {
+      if (!frame) frame = requestAnimationFrame(updateActive);
+    }, { passive: true });
+    links.forEach(link => link.addEventListener('click', event => {
+      if (!link.hash) return;
+      event.preventDefault();
+      history.replaceState(null, '', link.hash);
+      scrollToSection(link.hash, 'smooth');
+    }));
+    if (location.hash) requestAnimationFrame(() => scrollToSection(location.hash, 'auto'));
+    updateActive();
+  }
+</script>

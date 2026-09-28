@@ -1,0 +1,81 @@
+---
+import type { CollectionEntry } from 'astro:content';
+interface Props { card: CollectionEntry<'cards'> }
+const { card } = Astro.props;
+const { title, description, image, imageAlt, category, author, duration, projectUrl } = card.data;
+const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undefined;
+---
+<article class="project-card" tabindex={href ? undefined : 0} aria-label={title}>
+  <div class="project-card__image-space" aria-hidden="true"></div>
+  <div class="project-card__image">
+    {image ? <img src={image} alt={imageAlt ?? ''} loading="lazy" width="640" height="470" /> : (
+      <div class="project-card__placeholder" aria-hidden="true"><span>&lt;/&gt;</span></div>
+    )}
+  </div>
+  <div class="project-card__info">
+    <span class="project-card__category">{category || 'Projekt'}</span>
+    <h3 class="project-card__title">
+      {href ? <a class="project-card__link" href={href}>{title}</a> : title}
+    </h3>
+    {description && <p class="project-card__description">{description}</p>}
+    {author && <p class="project-card__by">von <span>{author}</span></p>}
+  </div>
+  <div class="project-card__tools">
+    <button class="project-card__like" type="button" data-favorite={card.id} aria-label={`${title} merken`} aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-9-5.6-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.4-9 12-9 12Z" /></svg>
+    </button>
+    {duration && <span class="project-card__duration">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 8v5l3 2M9 2h6M12 2v3" /></svg>
+      {duration}
+    </span>}
+  </div>
+</article>
+
+<style>
+  .project-card { position: relative; isolation: isolate; min-width: 0; border-radius: 12px; background: #fff; box-shadow: 0 13px 10px -7px rgb(0 0 0 / 10%); transition: transform .4s cubic-bezier(.175,.885,0,1), box-shadow .4s; }
+  .project-card__image-space { height: 235px; }
+  .project-card__image { position: absolute; inset: 0 0 auto; height: 235px; border-radius: 12px 12px 0 0; overflow: hidden; z-index: -1; transition: height .3s ease-out, opacity .3s ease-out; }
+  .project-card__image img, .project-card__placeholder { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .project-card__placeholder { display: grid; place-items: center; background: radial-gradient(ellipse at 25% 25%, #a2c9b6, transparent 60%), linear-gradient(135deg, #274d40, #89a7ad); color: #fff; }
+  .project-card__placeholder span { font-size: 3.5rem; font-weight: 700; opacity: .8; }
+  .project-card__info { padding: 20px 24px 24px; border-radius: 0 0 12px 12px; }
+  .project-card__category { text-transform: uppercase; font-size: .75rem; letter-spacing: 2px; color: #66716a; }
+  .project-card__title { font-size: 1.3rem; line-height: 1.35; margin: 8px 0 10px; overflow-wrap: anywhere; }
+  .project-card__link { text-decoration: none; }
+  .project-card__link::after { content: ''; position: absolute; inset: 0; border-radius: 12px; }
+  .project-card__description { font-size: .9rem; color: #526057; white-space: pre-line; overflow-wrap: anywhere; margin: 0 0 16px; }
+  .project-card__by { font-size: .8rem; margin: 0; }
+  .project-card__by span { color: #805836; font-weight: 700; }
+  .project-card__tools { position: absolute; inset: 14px 14px auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; pointer-events: none; }
+  .project-card__like { pointer-events: auto; position: relative; z-index: 1; display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: rgb(255 255 255 / 92%); color: #202b27; cursor: pointer; }
+  .project-card__like svg { width: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+  .project-card__like[aria-pressed='true'] { color: #a1444d; }
+  .project-card__like[aria-pressed='true'] svg { fill: currentColor; }
+  .project-card__duration { display: flex; align-items: center; gap: 6px; background: rgb(255 255 255 / 92%); border-radius: 20px; padding: 7px 10px; font-size: .75rem; color: #805836; }
+  .project-card__duration svg { width: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+  .project-card:focus-visible { outline: 3px solid #32664b; outline-offset: 5px; }
+  .project-card:focus-within { box-shadow: 0 24px 20px -10px rgb(0 0 0 / 18%); }
+  .project-card:focus-within .project-card__image { height: 100%; opacity: .18; border-radius: 12px; }
+  @media (hover: hover) and (pointer: fine) {
+    .project-card__tools { opacity: 0; transition: opacity .2s; }
+    .project-card:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 30px 18px -8px rgb(0 0 0 / 14%); z-index: 1; }
+    .project-card:hover .project-card__image { height: 100%; opacity: .18; border-radius: 12px; }
+    .project-card:hover .project-card__tools, .project-card:focus-within .project-card__tools { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .project-card, .project-card__image, .project-card__tools { transition: none; }
+    .project-card:hover { transform: none; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-favorite]').forEach(button => {
+    const key = `website:favorite:${button.dataset.favorite}`;
+    try { button.setAttribute('aria-pressed', String(localStorage.getItem(key) === 'true')); } catch { /* Storage may be disabled. */ }
+    button.addEventListener('click', () => {
+      const pressed = button.getAttribute('aria-pressed') !== 'true';
+      button.setAttribute('aria-pressed', String(pressed));
+      try { localStorage.setItem(key, String(pressed)); } catch { /* Keep the toggle usable in this session. */ }
+    });
+  });
+</script>
