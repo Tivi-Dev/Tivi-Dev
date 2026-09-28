@@ -76,6 +76,109 @@ export default config({
         }),
       },
     }),
+    menuebar: singleton({
+      label: 'Menübar',
+      path: 'src/content/menuebar',
+      format: { data: 'json' },
+      schema: {
+        links: fields.array(fields.object({
+          label: fields.text({
+            label: 'Linktext',
+            validation: { isRequired: true },
+          }),
+          href: fields.text({
+            label: 'Ziel (URL oder Anker)',
+            validation: { isRequired: true },
+            description: 'Beispiele: /#home, /impressum/',
+          }),
+        }), {
+          label: 'Menülinks',
+          itemLabel: (props) => props.fields.label.value || 'Neuer Link',
+        }),
+      },
+    }),
+    footer: singleton({
+      label: 'Footer',
+      path: 'src/content/footer',
+      format: { data: 'json' },
+      schema: {
+        label: fields.text({
+          label: 'Footer-Label',
+          validation: { isRequired: true },
+        }),
+        links: fields.array(fields.object({
+          label: fields.text({
+            label: 'Linktext',
+            validation: { isRequired: true },
+          }),
+          href: fields.text({
+            label: 'Ziel (URL oder Anker)',
+            validation: { isRequired: true },
+            description: 'Beispiele: /impressum/, /datenschutz/',
+          }),
+        }), {
+          label: 'Footer-Links',
+          itemLabel: (props) => props.fields.label.value || 'Neuer Link',
+        }),
+      },
+    }),
+    skills: singleton({
+      label: 'Skills',
+      path: 'src/content/skills',
+      format: { data: 'json' },
+      schema: {
+        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
+        intro: fields.text({ label: 'Einleitung', multiline: true }),
+      },
+    }),
+    projekte: singleton({
+      label: 'Projekte',
+      path: 'src/content/projekte',
+      format: { data: 'json' },
+      schema: {
+        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
+        intro: fields.text({ label: 'Einleitung', multiline: true }),
+      },
+    }),
+    ueberMich: singleton({
+      label: 'Über mich',
+      path: 'src/content/ueber-mich',
+      format: { data: 'json' },
+      schema: {
+        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
+        intro: fields.text({ label: 'Einleitung', multiline: true }),
+        content: fields.text({ label: 'Inhalt', multiline: true }),
+      },
+    }),
+    kontakt: singleton({
+      label: 'Kontakt',
+      path: 'src/content/kontakt',
+      format: { data: 'json' },
+      schema: {
+        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
+        intro: fields.text({ label: 'Einleitung', multiline: true }),
+        email: fields.text({ label: 'E-Mail' }),
+        phone: fields.text({ label: 'Telefon' }),
+      },
+    }),
+    impressum: singleton({
+      label: 'Impressum',
+      path: 'src/content/impressum',
+      format: { data: 'json' },
+      schema: {
+        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
+        content: fields.text({ label: 'Inhalt', multiline: true, validation: { isRequired: true } }),
+      },
+    }),
+    datenschutz: singleton({
+      label: 'Datenschutz',
+      path: 'src/content/datenschutz',
+      format: { data: 'json' },
+      schema: {
+        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
+        content: fields.text({ label: 'Inhalt', multiline: true, validation: { isRequired: true } }),
+      },
+    }),
   },
   collections: {
     cards: collection({

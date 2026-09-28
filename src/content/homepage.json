@@ -3,9 +3,29 @@
   "description": "test",
   "content": [
     {
+      "text": "Anwendungsentwickler in Ausbildung",
+      "style": "paragraph",
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "spaceBefore": 0,
+      "spaceAfter": 3
+    },
+    {
+      "text": "mit Fokus auf Frontend",
+      "style": "paragraph",
+      "fontSize": 20,
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "spaceBefore": 0,
+      "spaceAfter": 16
+    },
+    {
       "text": "Sergey",
       "style": "heading1",
-      "bold": false,
+      "fontSize": 100,
+      "bold": true,
       "italic": false,
       "underline": false,
       "spaceBefore": 0,
@@ -14,7 +34,28 @@
     {
       "text": "Fokin",
       "style": "heading1",
+      "fontSize": 100,
+      "bold": true,
+      "italic": false,
+      "underline": false,
+      "spaceBefore": 0,
+      "spaceAfter": 16
+    },
+    {
+      "text": "\"Software sollte man spüren...\"",
+      "style": "heading3",
+      "fontSize": 25,
       "bold": false,
+      "italic": false,
+      "underline": false,
+      "spaceBefore": 0,
+      "spaceAfter": 2
+    },
+    {
+      "text": "... sie sollte Funktionieren !",
+      "style": "paragraph",
+      "fontSize": 20,
+      "bold": true,
       "italic": false,
       "underline": false,
       "spaceBefore": 0,

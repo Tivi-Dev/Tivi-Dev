@@ -13,6 +13,7 @@ npm run dev
 - Inhalte bearbeiten: http://127.0.0.1:4321/keystatic
 
 Unter **Startseite** lassen sich Seitentitel, Suchmaschinenbeschreibung, Foto und der linke Seiteninhalt bearbeiten. Der Seiteninhalt besteht aus nummerierten Zeilen mit eigenem Textstil, Schriftgröße, Fett-/Kursiv-/Unterstreichung sowie individuellem Abstand nach oben und unten.
+Zusätzlich gibt es Singletons für **Menübar**, **Footer**, **Skills**, **Projekte**, **Über mich**, **Kontakt**, **Impressum** und **Datenschutz**.
 Die Startseite nutzt einen Präsentationsmodus: Beim Scrollen wird abschnittsweise „gesnapt“ (Home, Skills, Projekte, Über Mich, Kontakt). Zusätzlich funktionieren Navigation per Mausrad/Trackpad, Pfeiltasten, Bild↑/Bild↓, Pos1/Ende sowie die Menülinks mit sanften Übergängen.
 
 ## Befehle
