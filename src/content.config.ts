@@ -25,6 +25,45 @@ const homepage = defineCollection({
   }),
 });
 
+const cardSchema = z.object({
+  title: z.string(),
+  section: z.enum(['frontend', 'backend', 'projekte', 'ueber-mich', 'kontakt']),
+  description: z.string().default(''),
+  image: z.string().nullish(),
+  imageAlt: z.string().optional(),
+  category: z.string().optional(),
+  author: z.string().optional(),
+  duration: z.string().optional(),
+  projectUrl: z.string().nullish(),
+}).superRefine(({ section, image }, context) => {
+  if (
+    (section === 'frontend' || section === 'backend')
+    && image
+    && !new URL(image, 'https://website.invalid').pathname.toLowerCase().endsWith('.svg')
+  ) {
+    context.addIssue({
+      code: 'custom',
+      path: ['image'],
+      message: 'Frontend- und Backend-Karten dürfen nur SVG-Icons verwenden.',
+    });
+  }
+});
+
+function validateCardIcon(data: unknown, filePath: string) {
+  if (typeof data !== 'object' || data === null) return;
+
+  const { section, image } = data as { section?: unknown; image?: unknown };
+  if (
+    (section === 'frontend' || section === 'backend')
+    && typeof image === 'string'
+    && !new URL(image, 'https://website.invalid').pathname.toLowerCase().endsWith('.svg')
+  ) {
+    throw new Error(
+      `${filePath}: Frontend- und Backend-Karten dürfen nur SVG-Icons verwenden.`,
+    );
+  }
+}
+
 const cards = defineCollection({
   loader: {
     name: 'keystatic-cards',
@@ -34,6 +73,7 @@ const cards = defineCollection({
       async function syncCard(filePath: string) {
         const id = basename(filePath, '.json');
         const data = JSON.parse(await readFile(filePath, 'utf8'));
+        validateCardIcon(data, filePath);
         store.set({ id, data: await parseData({ id, data, filePath }) });
       }
       store.clear();
@@ -55,17 +95,7 @@ const cards = defineCollection({
       }
     },
   },
-  schema: z.object({
-    title: z.string(),
-    section: z.enum(['frontend', 'backend', 'projekte', 'ueber-mich', 'kontakt']),
-    description: z.string().default(''),
-    image: z.string().nullish(),
-    imageAlt: z.string().optional(),
-    category: z.string().optional(),
-    author: z.string().optional(),
-    duration: z.string().optional(),
-    projectUrl: z.string().nullish(),
-  }),
+  schema: cardSchema,
 });
 
 export const collections = { homepage, cards };

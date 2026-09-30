@@ -201,7 +201,8 @@ export default config({
         }),
         description: fields.text({ label: 'Beschreibung', multiline: true }),
         image: fields.image({
-          label: 'Kartenbild (optional)',
+          label: 'Kartenbild / Icon (optional)',
+          description: 'Für Karten in den Bereichen Frontend und Backend sind ausschließlich SVG-Dateien erlaubt.',
           directory: 'public/images/cards',
           publicPath: '/images/cards/',
         }),
