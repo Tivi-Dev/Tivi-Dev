@@ -1,8 +1,31 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 import './src/styles/keystatic-editor.css';
 
+const createCardSchema = (isSkillArea: boolean) => ({
+  title: fields.slug({ name: { label: 'Kartentitel' } }),
+  description: fields.text({ label: 'Beschreibung', multiline: true }),
+  image: fields.image({
+    label: 'Kartenbild / Icon (optional)',
+    description: isSkillArea
+      ? 'In dieser Collection sind ausschließlich SVG-Dateien erlaubt.'
+      : 'Optionales Kartenbild für Projekte.',
+    directory: 'public/images/cards',
+    publicPath: '/images/cards/',
+  }),
+  imageAlt: fields.text({ label: 'Bildbeschreibung' }),
+  category: fields.text({ label: 'Kategorie / Untertitel', description: 'Wird auf Skills- und Projektkarten angezeigt.' }),
+  author: fields.text({ label: 'Projekt: Autor' }),
+  duration: fields.text({ label: 'Projekt: Zeitangabe', description: 'Optional, zum Beispiel 3 Wochen.' }),
+  projectUrl: fields.url({ label: 'Kartenlink (optional)', description: 'Ziel beim Anklicken einer Skills- oder Projektkarte.' }),
+});
+
 export default config({
   storage: { kind: 'local' },
+  ui: {
+    brand: {
+      name: 'Tivi-Dev Portfolio',
+    },
+  },
   singletons: {
     settings: singleton({
       label: 'Website-Einstellungen',
@@ -127,27 +150,48 @@ export default config({
       path: 'src/content/skills',
       format: { data: 'json' },
       schema: {
-        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
-        intro: fields.text({ label: 'Einleitung', multiline: true }),
+        frontendOrder: fields.array(fields.text({ label: 'Karten-Slug' }), {
+          label: 'Reihenfolge Frontend-Karten',
+          description: 'Nur für Frontend: Slugs in Wunschreihenfolge eintragen (z. B. html, css).',
+          itemLabel: (props) => props.value || 'Slug',
+        }),
+        backendOrder: fields.array(fields.text({ label: 'Karten-Slug' }), {
+          label: 'Reihenfolge Backend-Karten',
+          description: 'Nur für Backend: Slugs in Wunschreihenfolge eintragen (z. B. docker).',
+          itemLabel: (props) => props.value || 'Slug',
+        }),
       },
     }),
     projekte: singleton({
       label: 'Projekte',
       path: 'src/content/projekte',
       format: { data: 'json' },
-      schema: {
-        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
-        intro: fields.text({ label: 'Einleitung', multiline: true }),
-      },
+      schema: {},
     }),
     ueberMich: singleton({
       label: 'Über mich',
       path: 'src/content/ueber-mich',
       format: { data: 'json' },
       schema: {
-        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
-        intro: fields.text({ label: 'Einleitung', multiline: true }),
-        content: fields.text({ label: 'Inhalt', multiline: true }),
+        photo: fields.image({
+          label: 'Foto links',
+          directory: 'public/images/ueber-mich',
+          publicPath: '/images/ueber-mich/',
+        }),
+        photoAlt: fields.text({ label: 'Bildbeschreibung Foto links' }),
+        content: fields.text({ label: 'Text rechts', multiline: true }),
+        gallery: fields.array(fields.object({
+          image: fields.image({
+            label: 'Galeriebild',
+            directory: 'public/images/ueber-mich/gallery',
+            publicPath: '/images/ueber-mich/gallery/',
+          }),
+          imageAlt: fields.text({ label: 'Bildbeschreibung' }),
+          caption: fields.text({ label: 'Beschriftung' }),
+        }), {
+          label: 'Fotostrecke unten',
+          itemLabel: (props) => props.fields.caption.value || 'Bild',
+        }),
       },
     }),
     kontakt: singleton({
@@ -155,8 +199,6 @@ export default config({
       path: 'src/content/kontakt',
       format: { data: 'json' },
       schema: {
-        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
-        intro: fields.text({ label: 'Einleitung', multiline: true }),
         email: fields.text({ label: 'E-Mail' }),
         phone: fields.text({ label: 'Telefon' }),
       },
@@ -181,37 +223,26 @@ export default config({
     }),
   },
   collections: {
-    cards: collection({
-      label: 'Karten',
+    frontendCards: collection({
+      label: 'Karten · Frontend',
       slugField: 'title',
-      path: 'src/content/cards/*',
+      path: 'src/content/cards/frontend/*',
       format: { data: 'json' },
-      schema: {
-        title: fields.slug({ name: { label: 'Kartentitel' } }),
-        section: fields.select({
-          label: 'Bereich',
-          options: [
-            { label: 'Frontend', value: 'frontend' },
-            { label: 'Backend', value: 'backend' },
-            { label: 'Projekte', value: 'projekte' },
-            { label: 'Über Mich', value: 'ueber-mich' },
-            { label: 'Kontakt', value: 'kontakt' },
-          ],
-          defaultValue: 'frontend',
-        }),
-        description: fields.text({ label: 'Beschreibung', multiline: true }),
-        image: fields.image({
-          label: 'Kartenbild / Icon (optional)',
-          description: 'Für Karten in den Bereichen Frontend und Backend sind ausschließlich SVG-Dateien erlaubt.',
-          directory: 'public/images/cards',
-          publicPath: '/images/cards/',
-        }),
-        imageAlt: fields.text({ label: 'Bildbeschreibung' }),
-        category: fields.text({ label: 'Kategorie / Untertitel', description: 'Wird auf Skills- und Projektkarten angezeigt.' }),
-        author: fields.text({ label: 'Projekt: Autor' }),
-        duration: fields.text({ label: 'Projekt: Zeitangabe', description: 'Optional, zum Beispiel 3 Wochen.' }),
-        projectUrl: fields.url({ label: 'Kartenlink (optional)', description: 'Ziel beim Anklicken einer Skills- oder Projektkarte.' }),
-      },
+      schema: createCardSchema(true),
+    }),
+    backendCards: collection({
+      label: 'Karten · Backend',
+      slugField: 'title',
+      path: 'src/content/cards/backend/*',
+      format: { data: 'json' },
+      schema: createCardSchema(true),
+    }),
+    projectCards: collection({
+      label: 'Karten · Projekte',
+      slugField: 'title',
+      path: 'src/content/cards/projekte/*',
+      format: { data: 'json' },
+      schema: createCardSchema(false),
     }),
   },
 });

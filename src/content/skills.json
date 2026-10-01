@@ -1,0 +1,8 @@
+{
+  "frontendOrder": [
+    "html",
+    "css",
+    "astro"
+  ],
+  "backendOrder": []
+}

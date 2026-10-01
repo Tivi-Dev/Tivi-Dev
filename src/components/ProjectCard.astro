@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-interface Props { card: CollectionEntry<'cards'> }
+interface Props { card: CollectionEntry<'projectCards'> }
 const { card } = Astro.props;
 const { title, description, image, imageAlt, category, author, duration, projectUrl } = card.data;
 const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undefined;
@@ -21,9 +21,6 @@ const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undef
     {author && <p class="project-card__by">von <span>{author}</span></p>}
   </div>
   <div class="project-card__tools">
-    <button class="project-card__like" type="button" data-favorite={card.id} aria-label={`${title} merken`} aria-pressed="false">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-9-5.6-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.4-9 12-9 12Z" /></svg>
-    </button>
     {duration && <span class="project-card__duration">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 8v5l3 2M9 2h6M12 2v3" /></svg>
       {duration}
@@ -46,11 +43,7 @@ const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undef
   .project-card__description { font-size: .9rem; color: #526057; white-space: pre-line; overflow-wrap: anywhere; margin: 0 0 16px; }
   .project-card__by { font-size: .8rem; margin: 0; }
   .project-card__by span { color: #805836; font-weight: 700; }
-  .project-card__tools { position: absolute; inset: 14px 14px auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; pointer-events: none; }
-  .project-card__like { pointer-events: auto; position: relative; z-index: 1; display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: rgb(255 255 255 / 92%); color: #202b27; cursor: pointer; }
-  .project-card__like svg { width: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; }
-  .project-card__like[aria-pressed='true'] { color: #a1444d; }
-  .project-card__like[aria-pressed='true'] svg { fill: currentColor; }
+  .project-card__tools { position: absolute; inset: 14px 14px auto auto; display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
   .project-card__duration { display: flex; align-items: center; gap: 6px; background: rgb(255 255 255 / 92%); border-radius: 20px; padding: 7px 10px; font-size: .75rem; color: #805836; }
   .project-card__duration svg { width: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; }
   .project-card:focus-visible { outline: 3px solid #32664b; outline-offset: 5px; }
@@ -67,15 +60,3 @@ const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undef
     .project-card:hover { transform: none; }
   }
 </style>
-
-<script>
-  document.querySelectorAll<HTMLButtonElement>('[data-favorite]').forEach(button => {
-    const key = `website:favorite:${button.dataset.favorite}`;
-    try { button.setAttribute('aria-pressed', String(localStorage.getItem(key) === 'true')); } catch { /* Storage may be disabled. */ }
-    button.addEventListener('click', () => {
-      const pressed = button.getAttribute('aria-pressed') !== 'true';
-      button.setAttribute('aria-pressed', String(pressed));
-      try { localStorage.setItem(key, String(pressed)); } catch { /* Keep the toggle usable in this session. */ }
-    });
-  });
-</script>

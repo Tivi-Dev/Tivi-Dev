@@ -25,9 +25,30 @@ const homepage = defineCollection({
   }),
 });
 
+const skills = defineCollection({
+  loader: glob({ pattern: 'skills.json', base: './src/content' }),
+  schema: z.object({
+    frontendOrder: z.array(z.string()).default([]),
+    backendOrder: z.array(z.string()).default([]),
+  }),
+});
+
+const ueberMich = defineCollection({
+  loader: glob({ pattern: 'ueber-mich.json', base: './src/content' }),
+  schema: z.object({
+    photo: z.string().nullish(),
+    photoAlt: z.string().optional(),
+    content: z.string().default(''),
+    gallery: z.array(z.object({
+      image: z.string().nullish(),
+      imageAlt: z.string().optional(),
+      caption: z.string().optional(),
+    })).default([]),
+  }),
+});
+
 const cardSchema = z.object({
   title: z.string(),
-  section: z.enum(['frontend', 'backend', 'projekte', 'ueber-mich', 'kontakt']),
   description: z.string().default(''),
   image: z.string().nullish(),
   imageAlt: z.string().optional(),
@@ -35,27 +56,13 @@ const cardSchema = z.object({
   author: z.string().optional(),
   duration: z.string().optional(),
   projectUrl: z.string().nullish(),
-}).superRefine(({ section, image }, context) => {
-  if (
-    (section === 'frontend' || section === 'backend')
-    && image
-    && !new URL(image, 'https://website.invalid').pathname.toLowerCase().endsWith('.svg')
-  ) {
-    context.addIssue({
-      code: 'custom',
-      path: ['image'],
-      message: 'Frontend- und Backend-Karten dürfen nur SVG-Icons verwenden.',
-    });
-  }
 });
 
-function validateCardIcon(data: unknown, filePath: string) {
+function validateSkillCardIcon(data: unknown, filePath: string) {
   if (typeof data !== 'object' || data === null) return;
-
-  const { section, image } = data as { section?: unknown; image?: unknown };
+  const { image } = data as { image?: unknown };
   if (
-    (section === 'frontend' || section === 'backend')
-    && typeof image === 'string'
+    typeof image === 'string'
     && !new URL(image, 'https://website.invalid').pathname.toLowerCase().endsWith('.svg')
   ) {
     throw new Error(
@@ -64,16 +71,19 @@ function validateCardIcon(data: unknown, filePath: string) {
   }
 }
 
-const cards = defineCollection({
+const createCardCollection = (
+  directoryName: 'frontend' | 'backend' | 'projekte',
+  validateImage: (data: unknown, filePath: string) => void = () => {},
+) => defineCollection({
   loader: {
-    name: 'keystatic-cards',
+    name: `keystatic-${directoryName}-cards`,
     async load({ store, parseData, config, watcher, logger }) {
-      const directory = new URL('./src/content/cards/', config.root);
+      const directory = new URL(`./src/content/cards/${directoryName}/`, config.root);
       const directoryPath = fileURLToPath(directory);
       async function syncCard(filePath: string) {
         const id = basename(filePath, '.json');
         const data = JSON.parse(await readFile(filePath, 'utf8'));
-        validateCardIcon(data, filePath);
+        validateImage(data, filePath);
         store.set({ id, data: await parseData({ id, data, filePath }) });
       }
       store.clear();
@@ -98,4 +108,8 @@ const cards = defineCollection({
   schema: cardSchema,
 });
 
-export const collections = { homepage, cards };
+const frontendCards = createCardCollection('frontend', validateSkillCardIcon);
+const backendCards = createCardCollection('backend', validateSkillCardIcon);
+const projectCards = createCardCollection('projekte');
+
+export const collections = { homepage, skills, ueberMich, frontendCards, backendCards, projectCards };

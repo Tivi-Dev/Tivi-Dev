@@ -5,8 +5,34 @@ import ProjectCard from '../components/ProjectCard.astro';
 import SkillCard from '../components/SkillCard.astro';
 const homepage = await getEntry('homepage', 'homepage');
 if (!homepage) throw new Error('Die Startseiten-Inhalte fehlen.');
-const cards = await getCollection('cards');
+const skills = await getEntry('skills', 'skills');
+const ueberMich = await getEntry('ueberMich', 'ueber-mich');
+const frontendCardsRaw = await getCollection('frontendCards');
+const backendCardsRaw = await getCollection('backendCards');
+const projectCards = await getCollection('projectCards');
 const { title, description, photo, photoAlt, content } = homepage.data;
+
+const sortCardsByOrder = (
+  sectionCards: typeof frontendCardsRaw | typeof backendCardsRaw,
+  orderedIds: string[],
+) => {
+  if (!orderedIds.length) return sectionCards;
+  const cardMap = new Map(sectionCards.map((card) => [card.id, card]));
+  const orderedCards = orderedIds
+    .map((id) => cardMap.get(id))
+    .filter((card): card is typeof sectionCards[number] => Boolean(card));
+  const unorderedCards = sectionCards.filter((card) => !orderedIds.includes(card.id));
+  return [...orderedCards, ...unorderedCards];
+};
+
+const frontendCards = sortCardsByOrder(
+  frontendCardsRaw,
+  skills?.data.frontendOrder ?? [],
+);
+const backendCards = sortCardsByOrder(
+  backendCardsRaw,
+  skills?.data.backendOrder ?? [],
+);
 ---
 <BaseLayout title={title} description={description} presentation>
   <section id="home" class="home-split slide" aria-label="Home">
@@ -41,13 +67,13 @@ const { title, description, photo, photoAlt, content } = homepage.data;
     <section class="skills-area" aria-labelledby="frontend-title">
       <h2 id="frontend-title">Frontend</h2>
       <div class="skill-cards">
-        {cards.filter(card => card.data.section === 'frontend').map(card => <SkillCard card={card} />)}
+        {frontendCards.map(card => <SkillCard card={card} />)}
       </div>
     </section>
     <section class="skills-area" aria-labelledby="backend-title">
       <h2 id="backend-title">Backend</h2>
       <div class="skill-cards">
-        {cards.filter(card => card.data.section === 'backend').map(card => <SkillCard card={card} />)}
+        {backendCards.map(card => <SkillCard card={card} />)}
       </div>
     </section>
   </section>
@@ -55,28 +81,60 @@ const { title, description, photo, photoAlt, content } = homepage.data;
     <div>
       <h2 id="projekte-title">Projekte</h2>
       <div class="project-cards">
-        {cards.filter(card => card.data.section === 'projekte').map(card => <ProjectCard card={card} />)}
+        {projectCards.map(card => <ProjectCard card={card} />)}
       </div>
     </div>
   </section>
-  {[
-    { id: 'ueber-mich', title: 'Über Mich' },
-    { id: 'kontakt', title: 'Kontakt' },
-  ].map(({ id, title }) => (
-    <section id={id} class="slide text-slide" aria-labelledby={`${id}-title`}>
-      <div>
-        <h2 id={`${id}-title`}>{title}</h2>
-        <p class="intro">Dieser Bereich entsteht gerade.</p>
-        <div class="card-grid">
-          {cards.filter((card) => card.data.section === id).map((card) => <article class="content-card">
-            {card.data.image && <img src={card.data.image} alt={card.data.imageAlt ?? ''} loading="lazy" />}
-            <h3>{card.data.title}</h3>
-            {card.data.description && <p>{card.data.description}</p>}
-          </article>)}
+  <section id="ueber-mich" class="slide text-slide about-slide" aria-labelledby="ueber-mich-title">
+    <div>
+      <h2 id="ueber-mich-title">Über Mich</h2>
+      <div class="about-layout">
+        <div class="about-photo">
+          {ueberMich?.data.photo ? (
+            <img src={ueberMich.data.photo} alt={ueberMich.data.photoAlt ?? ''} loading="lazy" />
+          ) : (
+            <div class="content-card" aria-hidden="true">Foto folgt</div>
+          )}
+        </div>
+        <div class="content-card about-content">
+          <p>{ueberMich?.data.content || 'Dieser Bereich entsteht gerade.'}</p>
         </div>
       </div>
-    </section>
-  ))}
+      {Boolean(ueberMich?.data.gallery.length) && (
+        <div class="about-gallery" aria-label="Fotostrecke">
+          {ueberMich?.data.gallery.map((item) => item.image && (
+            <figure class="content-card about-gallery__item">
+              <button
+                class="about-gallery__trigger"
+                type="button"
+                data-gallery-image={item.image}
+                data-gallery-alt={item.imageAlt ?? ''}
+                data-gallery-caption={item.caption ?? ''}
+                aria-label={`Bild vergrößern${item.caption ? `: ${item.caption}` : ''}`}
+              >
+                <img src={item.image} alt={item.imageAlt ?? ''} loading="lazy" />
+              </button>
+              {item.caption && <figcaption>{item.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+  <section id="kontakt" class="slide text-slide" aria-labelledby="kontakt-title">
+    <div>
+      <h2 id="kontakt-title">Kontakt</h2>
+      <p class="intro">Dieser Bereich entsteht gerade.</p>
+    </div>
+  </section>
+  <div class="gallery-lightbox" hidden data-gallery-lightbox>
+    <div class="gallery-lightbox__backdrop" data-gallery-close></div>
+    <figure class="gallery-lightbox__content">
+      <img src="" alt="" data-gallery-preview />
+      <figcaption data-gallery-caption></figcaption>
+      <button class="gallery-lightbox__close" type="button" data-gallery-close aria-label="Vollbild schließen">×</button>
+    </figure>
+  </div>
 </BaseLayout>
 
 <script>
@@ -184,5 +242,41 @@ const { title, description, photo, photoAlt, content } = homepage.data;
       }
     }
     updateActive();
+  }
+
+  const galleryLightbox = document.querySelector<HTMLElement>('[data-gallery-lightbox]');
+  const galleryPreview = galleryLightbox?.querySelector<HTMLImageElement>('[data-gallery-preview]');
+  const galleryCaption = galleryLightbox?.querySelector<HTMLElement>('[data-gallery-caption]');
+  const galleryTriggers = document.querySelectorAll<HTMLButtonElement>('.about-gallery__trigger');
+  const galleryCloseControls = galleryLightbox?.querySelectorAll<HTMLElement>('[data-gallery-close]');
+
+  const closeGalleryLightbox = () => {
+    if (!galleryLightbox) return;
+    galleryLightbox.hidden = true;
+    document.body.style.overflow = '';
+  };
+
+  if (galleryLightbox && galleryPreview && galleryCaption && galleryTriggers.length) {
+    galleryTriggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const image = trigger.dataset.galleryImage;
+        if (!image) return;
+        galleryPreview.src = image;
+        galleryPreview.alt = trigger.dataset.galleryAlt ?? '';
+        galleryCaption.textContent = trigger.dataset.galleryCaption ?? '';
+        galleryLightbox.hidden = false;
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    galleryCloseControls?.forEach((control) => {
+      control.addEventListener('click', closeGalleryLightbox);
+    });
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !galleryLightbox.hidden) {
+        closeGalleryLightbox();
+      }
+    });
   }
 </script>

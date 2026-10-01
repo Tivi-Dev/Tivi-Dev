@@ -15,6 +15,9 @@ npm run dev
 Unter **Startseite** lassen sich Seitentitel, Suchmaschinenbeschreibung, Foto und der linke Seiteninhalt bearbeiten. Der Seiteninhalt besteht aus nummerierten Zeilen mit eigenem Textstil, Schriftgröße, Fett-/Kursiv-/Unterstreichung sowie individuellem Abstand nach oben und unten.
 Zusätzlich gibt es Singletons für **Menübar**, **Footer**, **Skills**, **Projekte**, **Über mich**, **Kontakt**, **Impressum** und **Datenschutz**.
 Für Karten in den Bereichen **Frontend** und **Backend** dürfen als Icons ausschließlich SVG-Dateien verwendet werden.
+Im Singleton **Skills** kann die Reihenfolge der Karten für **Frontend** und **Backend** getrennt festgelegt werden (über Slugs in Wunschreihenfolge).
+Die Karten sind in Keystatic als drei getrennte Collections organisiert: **Karten · Frontend**, **Karten · Backend** und **Karten · Projekte**.
+Im Singleton **Über mich** können ein linkes Hauptfoto, der rechte Textbereich und eine Fotostrecke unterhalb gepflegt werden.
 Die Startseite nutzt einen Präsentationsmodus: Beim Scrollen wird abschnittsweise „gesnapt“ (Home, Skills, Projekte, Über Mich, Kontakt). Zusätzlich funktionieren Navigation per Mausrad/Trackpad, Pfeiltasten, Bild↑/Bild↓, Pos1/Ende sowie die Menülinks mit sanften Übergängen.
 
 ## Befehle
