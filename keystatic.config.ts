@@ -179,7 +179,52 @@ export default config({
           publicPath: '/images/ueber-mich/',
         }),
         photoAlt: fields.text({ label: 'Bildbeschreibung Foto links' }),
-        content: fields.text({ label: 'Text rechts', multiline: true }),
+        content: fields.array(fields.object({
+          text: fields.text({
+            label: 'Text der Zeile',
+            multiline: true,
+            validation: { isRequired: true },
+          }),
+          style: fields.select({
+            label: 'Stil',
+            options: [
+              { label: 'H1 – Groß', value: 'heading1' },
+              { label: 'H2 – Mittel', value: 'heading2' },
+              { label: 'H3 – Klein', value: 'heading3' },
+              { label: 'Text', value: 'paragraph' },
+            ],
+            defaultValue: 'paragraph',
+          }),
+          fontSize: fields.integer({
+            label: 'Größe in px',
+            validation: { min: 8, max: 200 },
+          }),
+          bold: fields.checkbox({
+            label: 'B',
+            defaultValue: false,
+          }),
+          italic: fields.checkbox({
+            label: 'I',
+            defaultValue: false,
+          }),
+          underline: fields.checkbox({
+            label: 'U',
+            defaultValue: false,
+          }),
+          spaceBefore: fields.integer({
+            label: 'Abstand oben',
+            defaultValue: 0,
+            validation: { isRequired: true, min: 0, max: 300 },
+          }),
+          spaceAfter: fields.integer({
+            label: 'Abstand unten',
+            defaultValue: 16,
+            validation: { isRequired: true, min: 0, max: 300 },
+          }),
+        }, { layout: [12, 3, 2, 1, 1, 1, 2, 2] }), {
+          label: 'Text rechts',
+          description: 'Jede Zeile kann einzeln formatiert und per Ziehen neu angeordnet werden.',
+        }),
         gallery: fields.array(fields.object({
           image: fields.image({
             label: 'Galeriebild',

@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import impressum from '../content/impressum.json';
+import datenschutz from '../content/datenschutz.json';
 
 export function getStaticPaths() {
   return [
@@ -16,10 +18,17 @@ const { title } = Astro.props;
 if (['skills', 'projekte', 'ueber-mich', 'kontakt'].includes(Astro.params.page ?? '')) {
   return Astro.redirect(`/#${Astro.params.page}`);
 }
+const legalContent = Astro.params.page === 'impressum'
+  ? impressum.content
+  : datenschutz.content;
 ---
 <BaseLayout title={`${title} · Meine Website`} description={`${title} – dieser Bereich entsteht gerade.`}>
   <section class="hero">
     <h1>{title}</h1>
-    <p class="intro">Dieser Bereich entsteht gerade.</p>
+    {legalContent ? (
+      <div class="prose legal-content">{legalContent}</div>
+    ) : (
+      <p class="intro">Hier können Inhalte über Keystatic ergänzt werden.</p>
+    )}
   </section>
 </BaseLayout>

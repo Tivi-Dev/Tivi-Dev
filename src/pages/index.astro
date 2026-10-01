@@ -3,10 +3,32 @@ import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import SkillCard from '../components/SkillCard.astro';
+import ueberMich from '../content/ueber-mich.json';
+
+interface AboutPageContent {
+  photo?: string | null;
+  photoAlt?: string;
+  content: {
+    text: string;
+    style: string;
+    fontSize?: number | null;
+    bold: boolean;
+    italic: boolean;
+    underline: boolean;
+    spaceBefore: number;
+    spaceAfter: number;
+  }[];
+  gallery: {
+    image?: string | null;
+    imageAlt?: string;
+    caption?: string;
+  }[];
+}
+
+const aboutPage: AboutPageContent = ueberMich;
 const homepage = await getEntry('homepage', 'homepage');
 if (!homepage) throw new Error('Die Startseiten-Inhalte fehlen.');
 const skills = await getEntry('skills', 'skills');
-const ueberMich = await getEntry('ueberMich', 'ueber-mich');
 const frontendCardsRaw = await getCollection('frontendCards');
 const backendCardsRaw = await getCollection('backendCards');
 const projectCards = await getCollection('projectCards');
@@ -36,6 +58,7 @@ const backendCards = sortCardsByOrder(
 ---
 <BaseLayout title={title} description={description} presentation>
   <section id="home" class="home-split slide" aria-label="Home">
+    <h2 class="page-title">Home</h2>
     <div class="home-text">
       <div class="prose home-content">
         {content.map(line => {
@@ -64,6 +87,7 @@ const backendCards = sortCardsByOrder(
     </div>
   </section>
   <section id="skills" class="slide skills-slide" aria-label="Skills">
+    <h2 class="page-title">Skills</h2>
     <section class="skills-area" aria-labelledby="frontend-title">
       <h2 id="frontend-title">Frontend</h2>
       <div class="skill-cards">
@@ -79,7 +103,7 @@ const backendCards = sortCardsByOrder(
   </section>
   <section id="projekte" class="slide text-slide projects-slide" aria-labelledby="projekte-title">
     <div>
-      <h2 id="projekte-title">Projekte</h2>
+      <h2 id="projekte-title" class="page-title">Projekte</h2>
       <div class="project-cards">
         {projectCards.map(card => <ProjectCard card={card} />)}
       </div>
@@ -87,22 +111,36 @@ const backendCards = sortCardsByOrder(
   </section>
   <section id="ueber-mich" class="slide text-slide about-slide" aria-labelledby="ueber-mich-title">
     <div>
-      <h2 id="ueber-mich-title">Über Mich</h2>
+      <h2 id="ueber-mich-title" class="page-title">Über Mich</h2>
       <div class="about-layout">
         <div class="about-photo">
-          {ueberMich?.data.photo ? (
-            <img src={ueberMich.data.photo} alt={ueberMich.data.photoAlt ?? ''} loading="lazy" />
+          {aboutPage.photo ? (
+            <img src={aboutPage.photo} alt={aboutPage.photoAlt ?? ''} loading="lazy" />
           ) : (
             <div class="content-card" aria-hidden="true">Foto folgt</div>
           )}
         </div>
         <div class="content-card about-content">
-          <p>{ueberMich?.data.content || 'Dieser Bereich entsteht gerade.'}</p>
+          {aboutPage.content.map(line => {
+            const className = `about-line about-line--${line.style}`;
+            const style = [
+              `--space-before: ${line.spaceBefore}px`,
+              `--space-after: ${line.spaceAfter}px`,
+              line.fontSize ? `font-size: ${line.fontSize}px` : '',
+              line.bold ? 'font-weight: 800' : '',
+              line.italic ? 'font-style: italic' : '',
+              line.underline ? 'text-decoration: underline' : '',
+            ].filter(Boolean).join('; ');
+            if (line.style === 'heading1') return <h1 class={className} style={style}>{line.text}</h1>;
+            if (line.style === 'heading2') return <h2 class={className} style={style}>{line.text}</h2>;
+            if (line.style === 'heading3') return <h3 class={className} style={style}>{line.text}</h3>;
+            return <p class={className} style={style}>{line.text}</p>;
+          })}
         </div>
       </div>
-      {Boolean(ueberMich?.data.gallery.length) && (
+      {Boolean(aboutPage.gallery.length) && (
         <div class="about-gallery" aria-label="Fotostrecke">
-          {ueberMich?.data.gallery.map((item) => item.image && (
+          {aboutPage.gallery.map((item) => item.image && (
             <figure class="content-card about-gallery__item">
               <button
                 class="about-gallery__trigger"
@@ -123,8 +161,27 @@ const backendCards = sortCardsByOrder(
   </section>
   <section id="kontakt" class="slide text-slide" aria-labelledby="kontakt-title">
     <div>
-      <h2 id="kontakt-title">Kontakt</h2>
-      <p class="intro">Dieser Bereich entsteht gerade.</p>
+      <h2 id="kontakt-title" class="page-title">Kontakt</h2>
+      <form class="contact-form" data-contact-form>
+        <label>
+          <span>Name</span>
+          <input name="from_name" type="text" autocomplete="name" required />
+        </label>
+        <label>
+          <span>E-Mail-Adresse</span>
+          <input name="reply_to" type="email" autocomplete="email" required />
+        </label>
+        <label>
+          <span>Betreff</span>
+          <input name="subject" type="text" required />
+        </label>
+        <label>
+          <span>Nachricht</span>
+          <textarea name="message" rows="6" required></textarea>
+        </label>
+        <button type="submit">Nachricht senden</button>
+        <p class="contact-form__status" data-contact-status aria-live="polite"></p>
+      </form>
     </div>
   </section>
   <div class="gallery-lightbox" hidden data-gallery-lightbox>
@@ -276,6 +333,45 @@ const backendCards = sortCardsByOrder(
     window.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && !galleryLightbox.hidden) {
         closeGalleryLightbox();
+      }
+    });
+  }
+</script>
+
+<script>
+  import emailjs from '@emailjs/browser';
+
+  const contactForm = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const contactStatus = document.querySelector<HTMLElement>('[data-contact-status]');
+
+  if (contactForm && contactStatus) {
+    contactForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!contactForm.checkValidity()) {
+        contactForm.reportValidity();
+        return;
+      }
+
+      const submitButton = contactForm.querySelector<HTMLButtonElement>('button[type="submit"]');
+      if (!submitButton) throw new Error('Der Senden-Button des Kontaktformulars fehlt.');
+
+      submitButton.disabled = true;
+      contactStatus.textContent = 'Nachricht wird gesendet …';
+      contactStatus.dataset.state = 'pending';
+
+      try {
+        await emailjs.sendForm('service_85uq3rn', 'template_xydiaar', contactForm, {
+          publicKey: 'QhemBjtENsSglwf7j',
+        });
+        contactForm.reset();
+        contactStatus.textContent = 'Vielen Dank! Deine Nachricht wurde gesendet.';
+        contactStatus.dataset.state = 'success';
+      } catch (error) {
+        console.error('EmailJS konnte die Kontaktanfrage nicht senden.', error);
+        contactStatus.textContent = 'Die Nachricht konnte nicht gesendet werden. Bitte versuche es später erneut.';
+        contactStatus.dataset.state = 'error';
+      } finally {
+        submitButton.disabled = false;
       }
     });
   }

@@ -1,11 +1,46 @@
 {
   "photo": "/images/ueber-mich/photo.png",
-  "content": "fsafsafsfsafsafsafsafsafsafsafafsafsf",
+  "content": [
+    {
+      "text": "Hi, ich bin Tivi und mache eine Ausbildung zum Fachinformatiker für Anwendungsentwicklung.",
+      "style": "paragraph",
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "spaceBefore": 0,
+      "spaceAfter": 20
+    },
+    {
+      "text": "Mein besonderes Interesse gilt der Frontend-Entwicklung.",
+      "style": "paragraph",
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "spaceBefore": 0,
+      "spaceAfter": 20
+    },
+    {
+      "text": "Ich gestalte gerne Websites und Benutzeroberflächen, bei denen Aussehen und Bedienung zusammenpassen. Dabei beschäftige ich mich mit klaren Layouts, responsivem Design und den kleinen Details, die eine Anwendung angenehm nutzbar machen.",
+      "style": "paragraph",
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "spaceBefore": 0,
+      "spaceAfter": 20
+    },
+    {
+      "text": "In eigenen Projekten wie InfraVision und dieser Website probiere ich neue Ideen aus und entwickle meine Fähigkeiten Schritt für Schritt weiter.",
+      "style": "paragraph",
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "spaceBefore": 0,
+      "spaceAfter": 16
+    }
+  ],
   "gallery": [
     {
-      "image": "/images/ueber-mich/gallery/gallery/0/image.svg",
-      "imageAlt": "da",
-      "caption": "dadsd"
+      "image": "/images/ueber-mich/gallery/gallery/0/image.svg"
     }
   ]
 }
