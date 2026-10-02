@@ -11,7 +11,7 @@ const createCardSchema = (isSkillArea: boolean) => ({
   image: fields.image({
     label: 'Kartenbild / Icon (optional)',
     description: isSkillArea
-      ? 'In dieser Collection sind ausschließlich SVG-Dateien erlaubt.'
+      ? 'Für Skill-Icons sind SVG- und PNG-Dateien erlaubt.'
       : 'Optionales Kartenbild für Projekte.',
     directory: 'public/images/cards',
     publicPath: '/images/cards/',

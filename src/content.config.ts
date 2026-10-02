@@ -106,10 +106,11 @@ function validateSkillCardIcon(data: unknown, filePath: string) {
   const { image } = data as { image?: unknown };
   if (
     typeof image === 'string'
-    && !new URL(image, 'https://website.invalid').pathname.toLowerCase().endsWith('.svg')
+    && image.trim() !== ''
+    && !/\.(svg|png)$/i.test(new URL(image, 'https://website.invalid').pathname)
   ) {
     throw new Error(
-      `${filePath}: Skill-Karten dürfen nur SVG-Icons verwenden.`,
+      `${filePath}: Skill-Karten dürfen nur SVG- oder PNG-Icons verwenden.`,
     );
   }
 }
