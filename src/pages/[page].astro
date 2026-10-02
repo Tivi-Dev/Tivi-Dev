@@ -1,5 +1,6 @@
 ---
 import { getEntry, render } from 'astro:content';
+import PrivacyBlocks from '../components/PrivacyBlocks.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 export function getStaticPaths() {
@@ -18,15 +19,18 @@ const page = Astro.params.page ?? '';
 if (['skills', 'projekte', 'ueber-mich', 'kontakt'].includes(page)) {
   return Astro.redirect(`/#${page}`);
 }
-const legalEntry = await getEntry('legal', page);
-const legalTitle = legalEntry?.data.title.trim() || title;
+const privacyEntry = page === 'datenschutz' ? await getEntry('privacy', 'datenschutz') : null;
+const legalEntry = page === 'datenschutz' ? null : await getEntry('legal', page);
+const legalTitle = privacyEntry?.data.title.trim() || legalEntry?.data.title.trim() || title;
 const hasLegalContent = Boolean(legalEntry?.body?.trim());
 const Content = legalEntry && hasLegalContent ? (await render(legalEntry)).Content : null;
 ---
 <BaseLayout title={`${legalTitle} · Meine Website`} description={`${legalTitle} auf dieser Website.`}>
   <section class="hero">
     <h1>{legalTitle}</h1>
-    {Content ? (
+    {privacyEntry ? (
+      <PrivacyBlocks blocks={privacyEntry.data.blocks} />
+    ) : Content ? (
       <div class="prose legal-content content-card"><Content /></div>
     ) : (
       <p class="intro">

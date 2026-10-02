@@ -21,6 +21,8 @@ Die Karten sind in Keystatic als drei getrennte Collections organisiert: **Karte
 Im Singleton **Über mich** können ein linkes Hauptfoto, der rechte Textbereich und eine Fotostrecke unterhalb gepflegt werden.
 Die Startseite nutzt einen Präsentationsmodus: Beim Scrollen wird abschnittsweise „gesnapt“ (Home, Skills, Projekte, Über Mich, Kontakt). Zusätzlich funktionieren Navigation per Mausrad/Trackpad, Pfeiltasten, Bild↑/Bild↓, Pos1/Ende sowie die Menülinks mit sanften Übergängen.
 
+Im Singleton **Datenschutz** wird der Inhalt über verschiebbare Boxen mit **Artikel**, **Überschrift** und **Text** bearbeitet. Der Texteditor unterstützt unter anderem Fett, Kursiv, Unterstreichen, Links, Listen und Tabellen. Pro Box lassen sich die Abstände davor, danach, unter den Überschriften und zwischen Textabsätzen einstellen. Die Inhalte werden in `src/content/legal/datenschutz.json` gespeichert.
+
 ## Befehle
 
 ```sh

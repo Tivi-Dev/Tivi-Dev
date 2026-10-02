@@ -1,0 +1,50 @@
+---
+import Markdoc from '@markdoc/markdoc';
+
+interface Block {
+  article: string;
+  heading: string;
+  text: string;
+  spaceBefore: number;
+  spaceAfter: number;
+  headingGap: number;
+  paragraphGap: number;
+}
+interface Props { blocks: Block[] }
+const { blocks } = Astro.props;
+const markdocConfig = {
+  tags: {
+    Unterstrichen: { render: 'u' },
+  },
+};
+const renderText = (text: string) => {
+  const node = Markdoc.parse(text);
+  const errors = Markdoc.validate(node, markdocConfig);
+  if (errors.some(({ error }) => error.level === 'critical' || error.level === 'error')) {
+    throw new Error('Ungültiger Inhalt in einer Datenschutzbox: ' + JSON.stringify(errors));
+  }
+  return Markdoc.renderers.html(Markdoc.transform(node, markdocConfig));
+};
+---
+<div class="privacy-blocks legal-content">
+  {blocks.map((block) => (
+    <section class="privacy-block content-card" style={`--box-before: ${block.spaceBefore}px; --box-after: ${block.spaceAfter}px; --heading-gap: ${block.headingGap}px; --paragraph-gap: ${block.paragraphGap}px`}>
+      {block.article.trim() && <h2>{block.article}</h2>}
+      {block.heading.trim() && <h3>{block.heading}</h3>}
+      <div class="privacy-block__text" set:html={renderText(block.text)} />
+    </section>
+  ))}
+</div>
+<style>
+  .privacy-blocks { display: flex; flex-direction: column; }
+  .privacy-block { margin-block: var(--box-before) var(--box-after); overflow-wrap: anywhere; }
+  .privacy-block > h2, .privacy-block > h3 { margin: 0 0 var(--heading-gap); }
+  .privacy-block__text :global(p), .privacy-block__text :global(ul),
+  .privacy-block__text :global(ol), .privacy-block__text :global(blockquote),
+  .privacy-block__text :global(table), .privacy-block__text :global(pre) { margin-block: 0 var(--paragraph-gap); }
+  .privacy-block__text :global(article > :last-child) { margin-bottom: 0; }
+  .privacy-block__text :global(table) { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+  .privacy-block__text :global(th), .privacy-block__text :global(td) { padding: 8px; border: 1px solid #d9ded5; }
+  .privacy-block__text :global(blockquote) { border-left: 3px solid #32664b; padding-left: 16px; }
+  .privacy-block__text :global(pre) { overflow-x: auto; }
+</style>

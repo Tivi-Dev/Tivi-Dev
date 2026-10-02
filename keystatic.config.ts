@@ -1,6 +1,7 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 import { block } from '@keystatic/core/content-components';
 import './src/styles/keystatic-editor.css';
+import { privacySingleton } from './src/lib/privacy-schema';
 
 const createCardSchema = (isSkillArea: boolean) => ({
   title: fields.slug({ name: { label: 'Kartentitel' } }),
@@ -255,15 +256,7 @@ export default config({
         content: legalDocumentField,
       },
     }),
-    datenschutz: singleton({
-      label: 'Datenschutz',
-      path: 'src/content/legal/datenschutz',
-      format: { contentField: 'content' },
-      schema: {
-        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
-        content: legalDocumentField,
-      },
-    }),
+    datenschutz: privacySingleton,
   },
   collections: {
     frontendCards: collection({
