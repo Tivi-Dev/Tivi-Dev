@@ -33,7 +33,11 @@ const skills = await getEntry('skills', 'skills');
 const frontendCardsRaw = await getCollection('frontendCards');
 const backendCardsRaw = await getCollection('backendCards');
 const projectCards = await getCollection('projectCards');
-const { title, description, photo, photoAlt, content } = homepage.data;
+const { title, description, photo, photoAlt, photoSettings, content } = homepage.data;
+const photoAspect = photoSettings.shape === 'circle' ? '1 / 1'
+  : { portrait: '4 / 5', square: '1 / 1', landscape: '4 / 3' }[photoSettings.aspect];
+const photoRadius = { rounded: '16px', rectangle: '0', circle: '50%' }[photoSettings.shape];
+const photoStyle = `--photo-width: ${photoSettings.size}%; --photo-aspect: ${photoAspect}; --photo-radius: ${photoRadius}; --photo-zoom: ${photoSettings.zoom / 100}; --photo-x: ${photoSettings.positionX}%; --photo-y: ${photoSettings.positionY}%`;
 const hasGalleryImages = aboutPage.gallery.some((item) => Boolean(item.image));
 const firstGalleryImage = aboutPage.gallery.find((item) => item.image)?.image ?? photo ?? '';
 
@@ -81,7 +85,7 @@ const backendCards = sortCardsByOrder(
         })}
       </div>
     </div>
-    <div class="home-photo">
+    <div class="home-photo" style={photoStyle}>
       {photo ? (
         <img src={photo} alt={photoAlt ?? ''} width="800" height="1000" fetchpriority="high" />
       ) : (
