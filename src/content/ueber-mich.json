@@ -40,7 +40,9 @@
   ],
   "gallery": [
     {
-      "image": "/images/ueber-mich/gallery/gallery/0/image.svg"
+      "image": "/images/ueber-mich/gallery/gallery/0/image.png",
+      "imageAlt": "Python Zertifikat",
+      "caption": "Python Zertifikat"
     }
   ]
 }

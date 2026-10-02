@@ -1,7 +1,6 @@
 ---
+import { getEntry, render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import impressum from '../content/impressum.json';
-import datenschutz from '../content/datenschutz.json';
 
 export function getStaticPaths() {
   return [
@@ -15,20 +14,25 @@ export function getStaticPaths() {
 }
 
 const { title } = Astro.props;
-if (['skills', 'projekte', 'ueber-mich', 'kontakt'].includes(Astro.params.page ?? '')) {
-  return Astro.redirect(`/#${Astro.params.page}`);
+const page = Astro.params.page ?? '';
+if (['skills', 'projekte', 'ueber-mich', 'kontakt'].includes(page)) {
+  return Astro.redirect(`/#${page}`);
 }
-const legalContent = Astro.params.page === 'impressum'
-  ? impressum.content
-  : datenschutz.content;
+const legalEntry = await getEntry('legal', page);
+const legalTitle = legalEntry?.data.title.trim() || title;
+const hasLegalContent = Boolean(legalEntry?.body?.trim());
+const Content = legalEntry && hasLegalContent ? (await render(legalEntry)).Content : null;
 ---
-<BaseLayout title={`${title} · Meine Website`} description={`${title} – dieser Bereich entsteht gerade.`}>
+<BaseLayout title={`${legalTitle} · Meine Website`} description={`${legalTitle} auf dieser Website.`}>
   <section class="hero">
-    <h1>{title}</h1>
-    {legalContent ? (
-      <div class="prose legal-content">{legalContent}</div>
+    <h1>{legalTitle}</h1>
+    {Content ? (
+      <div class="prose legal-content content-card"><Content /></div>
     ) : (
-      <p class="intro">Hier können Inhalte über Keystatic ergänzt werden.</p>
+      <p class="intro">
+        Es ist noch kein Text hinterlegt. Du kannst ihn in Keystatic unter
+        „{legalTitle}“ im Feld „Inhalt“ eintragen.
+      </p>
     )}
   </section>
 </BaseLayout>

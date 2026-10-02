@@ -56,6 +56,11 @@ const ueberMich = defineCollection({
   }),
 });
 
+const legal = defineCollection({
+  loader: glob({ pattern: '*.mdoc', base: './src/content/legal' }),
+  schema: z.object({ title: z.string() }),
+});
+
 const cardSchema = z.object({
   title: z.string(),
   description: z.string().default(''),
@@ -121,4 +126,4 @@ const frontendCards = createCardCollection('frontend', validateSkillCardIcon);
 const backendCards = createCardCollection('backend', validateSkillCardIcon);
 const projectCards = createCardCollection('projekte');
 
-export const collections = { homepage, skills, ueberMich, frontendCards, backendCards, projectCards };
+export const collections = { homepage, skills, ueberMich, legal, frontendCards, backendCards, projectCards };

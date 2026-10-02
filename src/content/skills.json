@@ -4,5 +4,10 @@
     "css",
     "astro"
   ],
-  "backendOrder": []
+  "backendOrder": [
+    "docker",
+    "ubuntu-server",
+    "windows-server",
+    "python"
+  ]
 }

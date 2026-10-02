@@ -1,0 +1,5 @@
+---
+interface Props { height?: number }
+const { height = 24 } = Astro.props;
+---
+<div class="legal-spacer" style={`height: ${Math.max(0, Math.min(400, Number(height) || 0))}px`} aria-hidden="true"></div>

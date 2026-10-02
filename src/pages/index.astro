@@ -1,5 +1,6 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import SkillCard from '../components/SkillCard.astro';
@@ -33,6 +34,8 @@ const frontendCardsRaw = await getCollection('frontendCards');
 const backendCardsRaw = await getCollection('backendCards');
 const projectCards = await getCollection('projectCards');
 const { title, description, photo, photoAlt, content } = homepage.data;
+const hasGalleryImages = aboutPage.gallery.some((item) => Boolean(item.image));
+const firstGalleryImage = aboutPage.gallery.find((item) => item.image)?.image ?? photo ?? '';
 
 const sortCardsByOrder = (
   sectionCards: typeof frontendCardsRaw | typeof backendCardsRaw,
@@ -184,14 +187,16 @@ const backendCards = sortCardsByOrder(
       </form>
     </div>
   </section>
-  <div class="gallery-lightbox" hidden data-gallery-lightbox>
-    <div class="gallery-lightbox__backdrop" data-gallery-close></div>
-    <figure class="gallery-lightbox__content">
-      <img src="" alt="" data-gallery-preview />
-      <figcaption data-gallery-caption></figcaption>
-      <button class="gallery-lightbox__close" type="button" data-gallery-close aria-label="Vollbild schließen">×</button>
-    </figure>
-  </div>
+  {hasGalleryImages && (
+    <div class="gallery-lightbox" hidden data-gallery-lightbox>
+      <div class="gallery-lightbox__backdrop" data-gallery-close></div>
+      <figure class="gallery-lightbox__content">
+        <Image src={firstGalleryImage} alt="" width={1200} height={900} data-gallery-preview />
+        <figcaption data-gallery-caption></figcaption>
+        <button class="gallery-lightbox__close" type="button" data-gallery-close aria-label="Vollbild schließen">×</button>
+      </figure>
+    </div>
+  )}
 </BaseLayout>
 
 <script>
@@ -318,6 +323,7 @@ const backendCards = sortCardsByOrder(
       trigger.addEventListener('click', () => {
         const image = trigger.dataset.galleryImage;
         if (!image) return;
+        galleryPreview.srcset = '';
         galleryPreview.src = image;
         galleryPreview.alt = trigger.dataset.galleryAlt ?? '';
         galleryCaption.textContent = trigger.dataset.galleryCaption ?? '';

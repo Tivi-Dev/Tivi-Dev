@@ -1,4 +1,5 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
+import { block } from '@keystatic/core/content-components';
 import './src/styles/keystatic-editor.css';
 
 const createCardSchema = (isSkillArea: boolean) => ({
@@ -17,6 +18,23 @@ const createCardSchema = (isSkillArea: boolean) => ({
   author: fields.text({ label: 'Projekt: Autor' }),
   duration: fields.text({ label: 'Projekt: Zeitangabe', description: 'Optional, zum Beispiel 3 Wochen.' }),
   projectUrl: fields.url({ label: 'Kartenlink (optional)', description: 'Ziel beim Anklicken einer Skills- oder Projektkarte.' }),
+});
+
+const legalDocumentField = fields.markdoc({
+  label: 'Inhalt',
+  description: 'Neue Zeile im selben Absatz: Shift+Enter. Leerzeilen und größere Abstände: über „+“ den Block „Leerzeile / Abstand“ einfügen.',
+  components: {
+    Abstand: block({
+      label: 'Leerzeile / Abstand',
+      schema: {
+        height: fields.integer({
+          label: 'Höhe in px',
+          defaultValue: 24,
+          validation: { isRequired: true, min: 0, max: 400 },
+        }),
+      },
+    }),
+  },
 });
 
 export default config({
@@ -250,20 +268,20 @@ export default config({
     }),
     impressum: singleton({
       label: 'Impressum',
-      path: 'src/content/impressum',
-      format: { data: 'json' },
+      path: 'src/content/legal/impressum',
+      format: { contentField: 'content' },
       schema: {
         title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
-        content: fields.text({ label: 'Inhalt', multiline: true, validation: { isRequired: true } }),
+        content: legalDocumentField,
       },
     }),
     datenschutz: singleton({
       label: 'Datenschutz',
-      path: 'src/content/datenschutz',
-      format: { data: 'json' },
+      path: 'src/content/legal/datenschutz',
+      format: { contentField: 'content' },
       schema: {
         title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
-        content: fields.text({ label: 'Inhalt', multiline: true, validation: { isRequired: true } }),
+        content: legalDocumentField,
       },
     }),
   },
