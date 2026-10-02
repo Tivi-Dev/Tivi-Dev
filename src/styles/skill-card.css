@@ -2,7 +2,7 @@
   .skill-card::before, .skill-card::after { content: ''; position: absolute; border-radius: inherit; pointer-events: none; }
   .skill-card::before { inset: 1px; background: var(--sub); z-index: -2; transition: transform .3s, box-shadow .3s; }
   .skill-card::after { inset: 0; background: var(--bg); z-index: -1; }
-  .skill-card__image { width: 100%; height: 96px; display: grid; place-items: center; overflow: hidden; border-radius: 12px; }
+  .skill-card__image { width: 100%; height: 96px; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); place-items: center; overflow: hidden; border-radius: 12px; }
   .skill-card__image img { display: block; width: calc(100% * var(--icon-scale)); height: calc(100% * var(--icon-scale)); object-fit: contain; }
   .skill-card__image > svg { width: calc(88px * var(--icon-scale)); height: calc(88px * var(--icon-scale)); }
   .skill-card__title { margin: 0; font-size: 1rem; font-weight: 800; line-height: 1.2; letter-spacing: -.02em; overflow-wrap: anywhere; min-width: 0; }

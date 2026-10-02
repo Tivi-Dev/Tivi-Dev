@@ -1,24 +1,30 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 import { block } from '@keystatic/core/content-components';
 import './src/styles/keystatic-editor.css';
+import { skillGroups } from './src/lib/skill-groups';
 import { aboutTopicsField } from './src/lib/about-schema';
 import { privacySingleton } from './src/lib/privacy-schema';
 
 const createCardSchema = (isSkillArea: boolean) => ({
-  title: fields.slug({ name: { label: 'Kartentitel' } }),
+  title: fields.slug({ name: { label: isSkillArea ? 'Kartenkennung (beim Anlegen)' : 'Kartentitel', ...(isSkillArea ? { description: 'Die Kennung wird für Zuordnungen verwendet. Zum Umbenennen den Kartentitel darunter ändern.' } : {}) } }),
+  ...(isSkillArea ? {
+    displayTitle: fields.text({ label: 'Kartentitel (Anzeige)', description: 'Ändert den sichtbaren Namen ohne die Kartenkennung zu ändern. Leer: bisheriger Kartenname.' }),
+  } : {}),
   description: fields.text({ label: 'Beschreibung', multiline: true }),
   image: fields.image({
     label: 'Kartenbild / Icon (optional)',
     description: isSkillArea
-      ? 'In dieser Collection sind ausschließlich SVG-Dateien erlaubt.'
+      ? 'Für Skill-Icons sind SVG- und PNG-Dateien erlaubt.'
       : 'Optionales Kartenbild für Projekte.',
     directory: 'public/images/cards',
     publicPath: '/images/cards/',
   }),
   imageAlt: fields.text({ label: 'Bildbeschreibung' }),
-  category: fields.text({ label: 'Kategorie / Untertitel', description: 'Wird auf Skills- und Projektkarten angezeigt.' }),
-  author: fields.text({ label: 'Projekt: Autor' }),
-  duration: fields.text({ label: 'Projekt: Zeitangabe', description: 'Optional, zum Beispiel 3 Wochen.' }),
+  ...(!isSkillArea ? {
+    category: fields.text({ label: 'Kategorie / Untertitel', description: 'Wird auf Projektkarten angezeigt.' }),
+    author: fields.text({ label: 'Projekt: Autor' }),
+    duration: fields.text({ label: 'Projekt: Zeitangabe', description: 'Optional, zum Beispiel 3 Wochen.' }),
+  } : {}),
   projectUrl: fields.url({ label: 'Kartenlink (optional)', description: 'Ziel beim Anklicken einer Skills- oder Projektkarte.' }),
 });
 
@@ -194,18 +200,14 @@ export default config({
       label: 'Skills',
       path: 'src/content/skills',
       format: { data: 'json' },
-      schema: {
-        frontendOrder: fields.array(fields.text({ label: 'Karten-Slug' }), {
-          label: 'Reihenfolge Frontend-Karten',
-          description: 'Nur für Frontend: Slugs in Wunschreihenfolge eintragen (z. B. html, css).',
-          itemLabel: (props) => props.value || 'Slug',
-        }),
-        backendOrder: fields.array(fields.text({ label: 'Karten-Slug' }), {
-          label: 'Reihenfolge Backend-Karten',
-          description: 'Nur für Backend: Slugs in Wunschreihenfolge eintragen (z. B. docker).',
-          itemLabel: (props) => props.value || 'Slug',
-        }),
-      },
+      schema: Object.fromEntries(skillGroups.map(group => [group.id, fields.array(
+        fields.relationship({ label: 'Skill-Karte', collection: 'skillCards', validation: { isRequired: true } }),
+        {
+          label: group.title,
+          description: 'Karten auswählen und per Ziehen sortieren. Die Karten selbst bearbeitest du unter „Skill-Karten“.',
+          itemLabel: (props) => props.value || 'Karte auswählen',
+        },
+      )])),
     }),
     projekte: singleton({
       label: 'Projekte',
@@ -248,17 +250,10 @@ export default config({
     datenschutz: privacySingleton,
   },
   collections: {
-    frontendCards: collection({
-      label: 'Karten · Frontend',
+    skillCards: collection({
+      label: 'Skill-Karten',
       slugField: 'title',
-      path: 'src/content/cards/frontend/*',
-      format: { data: 'json' },
-      schema: createCardSchema(true),
-    }),
-    backendCards: collection({
-      label: 'Karten · Backend',
-      slugField: 'title',
-      path: 'src/content/cards/backend/*',
+      path: 'src/content/cards/skills/*',
       format: { data: 'json' },
       schema: createCardSchema(true),
     }),

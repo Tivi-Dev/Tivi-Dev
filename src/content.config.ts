@@ -37,8 +37,12 @@ const homepage = defineCollection({
 const skills = defineCollection({
   loader: glob({ pattern: 'skills.json', base: './src/content' }),
   schema: z.object({
-    frontendOrder: z.array(z.string()).default([]),
-    backendOrder: z.array(z.string()).default([]),
+    frontend: z.array(z.string()).default([]),
+    cms: z.array(z.string()).default([]),
+    design: z.array(z.string()).default([]),
+    backend: z.array(z.string()).default([]),
+    tools: z.array(z.string()).default([]),
+    databases: z.array(z.string()).default([]),
   }),
 });
 
@@ -88,6 +92,7 @@ const privacy = defineCollection({
 
 const cardSchema = z.object({
   title: z.string(),
+  displayTitle: z.string().optional(),
   description: z.string().default(''),
   image: z.string().nullish(),
   imageAlt: z.string().optional(),
@@ -102,16 +107,17 @@ function validateSkillCardIcon(data: unknown, filePath: string) {
   const { image } = data as { image?: unknown };
   if (
     typeof image === 'string'
-    && !new URL(image, 'https://website.invalid').pathname.toLowerCase().endsWith('.svg')
+    && image.trim() !== ''
+    && !/\.(svg|png)$/i.test(new URL(image, 'https://website.invalid').pathname)
   ) {
     throw new Error(
-      `${filePath}: Frontend- und Backend-Karten dürfen nur SVG-Icons verwenden.`,
+      `${filePath}: Skill-Karten dürfen nur SVG- oder PNG-Icons verwenden.`,
     );
   }
 }
 
 const createCardCollection = (
-  directoryName: 'frontend' | 'backend' | 'projekte',
+  directoryName: 'skills' | 'projekte',
   validateImage: (data: unknown, filePath: string) => void = () => {},
 ) => defineCollection({
   loader: {
@@ -147,8 +153,7 @@ const createCardCollection = (
   schema: cardSchema,
 });
 
-const frontendCards = createCardCollection('frontend', validateSkillCardIcon);
-const backendCards = createCardCollection('backend', validateSkillCardIcon);
+const skillCards = createCardCollection('skills', validateSkillCardIcon);
 const projectCards = createCardCollection('projekte');
 
-export const collections = { homepage, skills, ueberMich, legal, privacy, frontendCards, backendCards, projectCards };
+export const collections = { homepage, skills, ueberMich, legal, privacy, skillCards, projectCards };
