@@ -9,9 +9,8 @@ const topic = (label: string) => fields.object({
 export const aboutTopicsField = fields.object({
   profile: topic('Persönliches Profil'),
   education: topic('Ausbildung'),
-  skills: topic('Skills & Interessen'),
-  experience: topic('Projekte & Praxis'),
   achievements: topic('Erfolge & Zertifikate'),
+  skills: topic('Skills & Interessen'),
   hobbies: topic('Hobbys'),
-  contact: topic('Kontakt'),
-}, { label: 'Themen rund um dein Profilfoto', description: 'Reihenfolge im Uhrzeigersinn: Profil → Ausbildung → Skills → Projekte → Zertifikate → Hobbys → Kontakt. Texte lassen sich mit der Werkzeugleiste formatieren. Leere Textfelder zeigen nur die Überschrift.' });
+  experience: topic('Projekte & Praxis'),
+}, { label: 'Themen rund um dein Profilfoto', description: 'Links: Profil, Zertifikate, Hobbys. Rechts: Ausbildung, Skills, Projekte. Texte lassen sich mit der Werkzeugleiste formatieren. Leere Textfelder zeigen nur die Überschrift.' });

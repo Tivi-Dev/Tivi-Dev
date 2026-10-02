@@ -53,7 +53,6 @@ const ueberMich = defineCollection({
       education: z.object({ title: z.string(), text: z.string().default('') }),
       skills: z.object({ title: z.string(), text: z.string().default('') }),
       hobbies: z.object({ title: z.string(), text: z.string().default('') }),
-      contact: z.object({ title: z.string(), text: z.string().default('') }),
     }),
   }),
 });

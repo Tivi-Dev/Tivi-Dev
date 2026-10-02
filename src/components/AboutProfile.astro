@@ -11,11 +11,10 @@ const { photo, photoAlt, topics } = Astro.props;
 const entries = [
   { key: 'profile', icon: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 21v-2a7 7 0 0 1 14 0v2' },
   { key: 'education', icon: 'm2 8 10-5 10 5-10 5ZM6 10v7q6 5 12 0v-7M22 8v9' },
-  { key: 'skills', icon: 'm8 5-6 7 6 7m8-14 6 7-6 7M14 3l-4 18' },
-  { key: 'experience', icon: 'M4 7h16v14H4ZM9 7V3h6v4M4 12h16M10 12v3h4v-3' },
   { key: 'achievements', icon: 'm9 14-2 8 5-3 5 3-2-8M18 8a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z' },
+  { key: 'skills', icon: 'm8 5-6 7 6 7m8-14 6 7-6 7M14 3l-4 18' },
   { key: 'hobbies', icon: 'M5 7h14l3 13h-5l-3-4h-4l-3 4H2ZM6 10v5M4 12.5h4M17 11h.01M19 14h.01' },
-  { key: 'contact', icon: 'M3 5h18v14H3Zm0 0 9 8 9-8' },
+  { key: 'experience', icon: 'M4 7h16v14H4ZM9 7V3h6v4M4 12h16M10 12v3h4v-3' },
 ] as const;
 const markdocConfig = { tags: { Unterstrichen: { render: 'u' } } };
 const renderText = (text: string) => {
@@ -29,12 +28,11 @@ const renderText = (text: string) => {
 ---
 <div class="profile-map">
   <svg class="profile-map__connections" viewBox="0 0 1000 668" preserveAspectRatio="none" fill="none" aria-hidden="true">
-    <path class="profile-map__line--warm" d="M500 215V95H550" />
-    <path d="M410 245 310 145H170" />
+    <path class="profile-map__line--warm" d="M410 245 310 145H170" />
     <path d="M590 245 690 145H830" />
     <path d="M630 334H830" />
     <path class="profile-map__line--warm" d="M380 390 280 490H160" />
-    <path class="profile-map__line--gold" d="M500 465V570H550" />
+    <path class="profile-map__line--gold" d="M370 334H170" />
     <path d="M595 425 730 570H830" />
   </svg>
   <div class="profile-map__portrait">
@@ -57,7 +55,7 @@ const renderText = (text: string) => {
   ))}
 </div>
 <style>
-  .profile-map { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr) 260px minmax(0, 1fr); grid-template-rows: minmax(180px, auto) minmax(260px, auto) minmax(180px, auto); grid-template-areas: "contact profile education" ". portrait skills" "hobbies achievements experience"; gap: 24px; align-items: center; }
+  .profile-map { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr) 260px minmax(0, 1fr); grid-template-rows: minmax(180px, auto) minmax(260px, auto) minmax(180px, auto); grid-template-areas: "profile . education" "achievements portrait skills" "hobbies . experience"; gap: 24px; align-items: center; }
   .profile-map__connections { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; stroke: #32664b; stroke-width: 2; }
   .profile-map__line--warm { stroke: #a44c2c; }
   .profile-map__line--gold { stroke: #88723d; }
@@ -67,13 +65,12 @@ const renderText = (text: string) => {
   .profile-map__topic { min-width: 0; width: min(100%, 290px); padding: 14px 18px; background: #f7f6f2; border-left: 2px solid #32664b; overflow-wrap: anywhere; }
   .profile-map__topic h3 { display: flex; align-items: center; gap: 9px; margin: 0 0 12px; font-size: 1rem; line-height: 1.3; letter-spacing: .035em; text-transform: uppercase; color: #32664b; }
   .profile-map__topic h3 svg { width: 25px; height: 25px; flex-shrink: 0; }
-  .profile-map__topic--profile { grid-area: profile; align-self: start; border-color: #a44c2c; }
+  .profile-map__topic--profile { grid-area: profile; justify-self: start; border-color: #a44c2c; }
   .profile-map__topic--experience { grid-area: experience; justify-self: end; align-self: end; }
-  .profile-map__topic--achievements { grid-area: achievements; align-self: end; border-color: #88723d; }
+  .profile-map__topic--achievements { grid-area: achievements; justify-self: start; border-color: #88723d; }
   .profile-map__topic--education { grid-area: education; justify-self: end; }
   .profile-map__topic--skills { grid-area: skills; width: 100%; justify-self: end; }
   .profile-map__topic--hobbies { grid-area: hobbies; justify-self: start; align-self: start; border-color: #a44c2c; }
-  .profile-map__topic--contact { grid-area: contact; justify-self: start; }
   .profile-map__topic--profile h3, .profile-map__topic--hobbies h3 { color: #a44c2c; }
   .profile-map__topic--achievements h3 { color: #88723d; }
   .profile-map__text { color: #526057; font-size: .95rem; line-height: 1.65; }
@@ -86,14 +83,12 @@ const renderText = (text: string) => {
   .profile-map__text :global(th), .profile-map__text :global(td) { border: 1px solid #d9ded5; padding: 6px; }
   .profile-map__text :global(pre) { overflow-x: auto; }
   @media (max-width: 1100px) {
-    .profile-map { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "portrait portrait" "profile education" "skills experience" "achievements hobbies" "contact contact"; gap: 24px; align-items: start; }
+    .profile-map { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "portrait portrait" "profile education" "achievements skills" "hobbies experience"; gap: 24px; align-items: start; }
     .profile-map__connections { display: none; }
     .profile-map__portrait { justify-self: center; width: min(260px, 70vw); margin-bottom: 12px; }
     .profile-map__topic { width: 100%; margin: 0; justify-self: stretch; align-self: stretch; padding: 18px; border-radius: 0 12px 12px 0; background: #fffefa; }
-    .profile-map__topic--contact { width: calc(50% - 12px); }
   }
   @media (max-width: 600px) {
-    .profile-map { grid-template-columns: minmax(0, 1fr); grid-template-areas: "portrait" "profile" "education" "skills" "experience" "achievements" "hobbies" "contact"; gap: 18px; }
-    .profile-map__topic--contact { width: 100%; }
+    .profile-map { grid-template-columns: minmax(0, 1fr); grid-template-areas: "portrait" "profile" "education" "achievements" "skills" "hobbies" "experience"; gap: 18px; }
   }
 </style>
