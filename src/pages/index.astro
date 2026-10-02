@@ -23,10 +23,13 @@ const photoStyle = `--photo-width: ${photoSettings.size}%; --photo-aspect: ${pho
 const skillCardMap = new Map(skillCards.map(card => [card.id, card]));
 const skillSections = skillGroups.map(group => ({
   ...group,
-  cards: [...new Set(skills?.data[group.id] ?? [])].map(id => {
+  cards: [...new Set(skills?.data[group.id] ?? [])].flatMap(id => {
     const card = skillCardMap.get(id);
-    if (!card) throw new Error(`Skills / ${group.title}: Die zugewiesene Karte „${id}“ fehlt.`);
-    return card;
+    if (!card) {
+      console.warn(`Skills / ${group.title}: Die zugewiesene Karte „${id}“ fehlt und wird übersprungen. Bitte die Zuordnung in Keystatic prüfen.`);
+      return [];
+    }
+    return [card];
   }),
 }));
 ---
