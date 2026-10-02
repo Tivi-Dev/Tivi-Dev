@@ -12,7 +12,7 @@ npm run dev
 - Website: http://127.0.0.1:4321
 - Inhalte bearbeiten: http://127.0.0.1:4321/keystatic
 
-Unter **Startseite** lassen sich Seitentitel, Suchmaschinenbeschreibung, Foto und der linke Seiteninhalt bearbeiten. Der Seiteninhalt besteht aus nummerierten Zeilen mit eigenem Textstil, Schriftgröße, Fett-/Kursiv-/Unterstreichung sowie individuellem Abstand nach oben und unten.
+Unter **Startseite** lassen sich Seitentitel, Suchmaschinenbeschreibung, Foto und der linke Seiteninhalt bearbeiten. Der Seiteninhalt besteht aus Textzeilen mit Inhaltsvorschau, eigenem Textstil, Schriftgröße, Fett-/Kursiv-/Unterstreichung sowie individuellem Abstand nach oben und unten.
 Zusätzlich gibt es Singletons für **Header**, **Footer**, **Skills**, **Projekte**, **Über mich**, **Kontakt**, **Impressum** und **Datenschutz**.
 Unter **Header** lässt sich der Website-Titel bearbeiten. Die Menüpunkte Home, Skills, Projekte, Über Mich und Kontakt sind fest in `src/layouts/BaseLayout.astro` hinterlegt.
 Für Karten in den Bereichen **Frontend** und **Backend** dürfen als Icons ausschließlich SVG-Dateien verwendet werden.
