@@ -1,3 +1,4 @@
+import { aboutIconNames, type AboutIconName } from './lib/about-icons';
 import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
 import { readdir, readFile } from 'node:fs/promises';
@@ -41,26 +42,26 @@ const skills = defineCollection({
   }),
 });
 
+const aboutTopicSchema = (defaultColor: string, defaultIcon: AboutIconName) => z.object({
+  title: z.string(),
+  text: z.string().default(''),
+  icon: z.enum(aboutIconNames).default(defaultIcon),
+  lineColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Bitte einen Hex-Farbcode mit sechs Zeichen verwenden.').default(defaultColor),
+});
+
 const ueberMich = defineCollection({
   loader: glob({ pattern: 'ueber-mich.json', base: './src/content' }),
   schema: z.object({
     photo: z.string().nullish(),
     photoAlt: z.string().optional(),
-    content: z.array(z.object({
-      text: z.string(),
-      style: z.enum(['heading1', 'heading2', 'heading3', 'paragraph']).default('paragraph'),
-      fontSize: z.number().int().min(8).max(200).nullable().optional(),
-      bold: z.boolean().default(false),
-      italic: z.boolean().default(false),
-      underline: z.boolean().default(false),
-      spaceBefore: z.number().int().min(0).max(300).default(0),
-      spaceAfter: z.number().int().min(0).max(300).default(16),
-    })).default([]),
-    gallery: z.array(z.object({
-      image: z.string().nullish(),
-      imageAlt: z.string().optional(),
-      caption: z.string().optional(),
-    })).default([]),
+    topics: z.object({
+      profile: aboutTopicSchema('#a44c2c', 'person'),
+      experience: aboutTopicSchema('#32664b', 'briefcase'),
+      achievements: aboutTopicSchema('#88723d', 'trophy'),
+      education: aboutTopicSchema('#32664b', 'education'),
+      skills: aboutTopicSchema('#32664b', 'code'),
+      hobbies: aboutTopicSchema('#a44c2c', 'gamepad'),
+    }),
   }),
 });
 

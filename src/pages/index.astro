@@ -1,32 +1,13 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
-import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import SkillCard from '../components/SkillCard.astro';
-import ueberMich from '../content/ueber-mich.json';
+import AboutProfile from '../components/AboutProfile.astro';
 
-interface AboutPageContent {
-  photo?: string | null;
-  photoAlt?: string;
-  content: {
-    text: string;
-    style: string;
-    fontSize?: number | null;
-    bold: boolean;
-    italic: boolean;
-    underline: boolean;
-    spaceBefore: number;
-    spaceAfter: number;
-  }[];
-  gallery: {
-    image?: string | null;
-    imageAlt?: string;
-    caption?: string;
-  }[];
-}
-
-const aboutPage: AboutPageContent = ueberMich;
+const aboutEntry = await getEntry('ueberMich', 'ueber-mich');
+if (!aboutEntry) throw new Error('Die Über-mich-Inhalte fehlen.');
+const aboutPage = aboutEntry.data;
 const homepage = await getEntry('homepage', 'homepage');
 if (!homepage) throw new Error('Die Startseiten-Inhalte fehlen.');
 const skills = await getEntry('skills', 'skills');
@@ -38,8 +19,6 @@ const photoAspect = photoSettings.shape === 'circle' ? '1 / 1'
   : { portrait: '4 / 5', square: '1 / 1', landscape: '4 / 3' }[photoSettings.aspect];
 const photoRadius = { rounded: '16px', rectangle: '0', circle: '50%' }[photoSettings.shape];
 const photoStyle = `--photo-width: ${photoSettings.size}%; --photo-aspect: ${photoAspect}; --photo-radius: ${photoRadius}; --photo-zoom: ${photoSettings.zoom / 100}; --photo-x: ${photoSettings.positionX}%; --photo-y: ${photoSettings.positionY}%`;
-const hasGalleryImages = aboutPage.gallery.some((item) => Boolean(item.image));
-const firstGalleryImage = aboutPage.gallery.find((item) => item.image)?.image ?? photo ?? '';
 
 const sortCardsByOrder = (
   sectionCards: typeof frontendCardsRaw | typeof backendCardsRaw,
@@ -119,51 +98,7 @@ const backendCards = sortCardsByOrder(
   <section id="ueber-mich" class="slide text-slide about-slide" aria-labelledby="ueber-mich-title">
     <div>
       <h2 id="ueber-mich-title" class="page-title">Über Mich</h2>
-      <div class="about-layout">
-        <div class="about-photo">
-          {aboutPage.photo ? (
-            <img src={aboutPage.photo} alt={aboutPage.photoAlt ?? ''} width="800" height="800" loading="lazy" />
-          ) : (
-            <div class="content-card" aria-hidden="true">Foto folgt</div>
-          )}
-        </div>
-        <div class="content-card about-content">
-          {aboutPage.content.map(line => {
-            const className = `about-line about-line--${line.style}`;
-            const style = [
-              `--space-before: ${line.spaceBefore}px`,
-              `--space-after: ${line.spaceAfter}px`,
-              line.fontSize ? `--line-font-size: ${line.fontSize}px` : '',
-              line.bold ? 'font-weight: 800' : '',
-              line.italic ? 'font-style: italic' : '',
-              line.underline ? 'text-decoration: underline' : '',
-            ].filter(Boolean).join('; ');
-            if (line.style === 'heading1') return <h1 class={className} style={style}>{line.text}</h1>;
-            if (line.style === 'heading2') return <h2 class={className} style={style}>{line.text}</h2>;
-            if (line.style === 'heading3') return <h3 class={className} style={style}>{line.text}</h3>;
-            return <p class={className} style={style}>{line.text}</p>;
-          })}
-        </div>
-      </div>
-      {Boolean(aboutPage.gallery.length) && (
-        <div class="about-gallery" aria-label="Fotostrecke">
-          {aboutPage.gallery.map((item) => item.image && (
-            <figure class="content-card about-gallery__item">
-              <button
-                class="about-gallery__trigger"
-                type="button"
-                data-gallery-image={item.image}
-                data-gallery-alt={item.imageAlt ?? ''}
-                data-gallery-caption={item.caption ?? ''}
-                aria-label={`Bild vergrößern${item.caption ? `: ${item.caption}` : ''}`}
-              >
-                <img src={item.image} alt={item.imageAlt ?? ''} loading="lazy" />
-              </button>
-              {item.caption && <figcaption>{item.caption}</figcaption>}
-            </figure>
-          ))}
-        </div>
-      )}
+      <AboutProfile photo={aboutPage.photo} photoAlt={aboutPage.photoAlt} topics={aboutPage.topics} />
     </div>
   </section>
   <section id="kontakt" class="slide text-slide" aria-labelledby="kontakt-title">
@@ -191,16 +126,6 @@ const backendCards = sortCardsByOrder(
       </form>
     </div>
   </section>
-  {hasGalleryImages && (
-    <div class="gallery-lightbox" hidden data-gallery-lightbox>
-      <div class="gallery-lightbox__backdrop" data-gallery-close></div>
-      <figure class="gallery-lightbox__content">
-        <Image src={firstGalleryImage} alt="" width={1200} height={900} data-gallery-preview />
-        <figcaption data-gallery-caption></figcaption>
-        <button class="gallery-lightbox__close" type="button" data-gallery-close aria-label="Vollbild schließen">×</button>
-      </figure>
-    </div>
-  )}
 </BaseLayout>
 
 <script>
@@ -263,9 +188,9 @@ const backendCards = sortCardsByOrder(
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (!canUsePresentation() || event.ctrlKey || event.metaKey || document.querySelector('[data-gallery-lightbox]:not([hidden])')) return;
+      if (!canUsePresentation() || event.ctrlKey || event.metaKey) return;
       const target = event.target as HTMLElement | null;
-      if (target?.closest('textarea, input, select, .site-header, .gallery-lightbox')) return;
+      if (target?.closest('textarea, input, select, .site-header')) return;
       const bounds = slides[currentIndex].getBoundingClientRect();
       const footerHeight = document.querySelector<HTMLElement>('.site-footer')?.offsetHeight ?? 0;
       if ((event.deltaY > 0 && bounds.bottom > window.innerHeight - footerHeight + 2)
@@ -280,7 +205,7 @@ const backendCards = sortCardsByOrder(
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (!canUsePresentation() || document.querySelector('[data-gallery-lightbox]:not([hidden])')) return;
+      if (!canUsePresentation()) return;
       const target = event.target as HTMLElement | null;
       if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(target.tagName))) return;
 
@@ -335,42 +260,6 @@ const backendCards = sortCardsByOrder(
     if (!initialHash) updateActive();
   }
 
-  const galleryLightbox = document.querySelector<HTMLElement>('[data-gallery-lightbox]');
-  const galleryPreview = galleryLightbox?.querySelector<HTMLImageElement>('[data-gallery-preview]');
-  const galleryCaption = galleryLightbox?.querySelector<HTMLElement>('[data-gallery-caption]');
-  const galleryTriggers = document.querySelectorAll<HTMLButtonElement>('.about-gallery__trigger');
-  const galleryCloseControls = galleryLightbox?.querySelectorAll<HTMLElement>('[data-gallery-close]');
-
-  const closeGalleryLightbox = () => {
-    if (!galleryLightbox) return;
-    galleryLightbox.hidden = true;
-    document.body.style.overflow = '';
-  };
-
-  if (galleryLightbox && galleryPreview && galleryCaption && galleryTriggers.length) {
-    galleryTriggers.forEach((trigger) => {
-      trigger.addEventListener('click', () => {
-        const image = trigger.dataset.galleryImage;
-        if (!image) return;
-        galleryPreview.srcset = '';
-        galleryPreview.src = image;
-        galleryPreview.alt = trigger.dataset.galleryAlt ?? '';
-        galleryCaption.textContent = trigger.dataset.galleryCaption ?? '';
-        galleryLightbox.hidden = false;
-        document.body.style.overflow = 'hidden';
-      });
-    });
-
-    galleryCloseControls?.forEach((control) => {
-      control.addEventListener('click', closeGalleryLightbox);
-    });
-
-    window.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && !galleryLightbox.hidden) {
-        closeGalleryLightbox();
-      }
-    });
-  }
 </script>
 
 <script>

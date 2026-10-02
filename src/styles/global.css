@@ -86,24 +86,10 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
 .about-content { color: #526057; }
 .about-content .about-line { margin-block: var(--space-before, 0) var(--space-after, 16px); white-space: pre-line; }
 .about-content h1, .about-content h2, .about-content h3 { color: #202b27; }
-.about-gallery { margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 220px)); justify-content: start; align-items: start; gap: 14px; }
-.about-gallery__item { margin: 0; padding: 10px; align-self: start; }
-.about-gallery__trigger { display: block; border: 0; background: transparent; padding: 0; width: 100%; cursor: zoom-in; }
-.about-gallery__item img { display: block; width: 100%; height: auto; border-radius: 8px; margin-bottom: 8px; }
-.about-gallery__item figcaption { color: #526057; font-size: .95rem; }
-.gallery-lightbox[hidden] { display: none; }
-.gallery-lightbox { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 24px; }
-.gallery-lightbox__backdrop { position: absolute; inset: 0; background: rgb(0 0 0 / 70%); }
-.gallery-lightbox__content { position: relative; z-index: 1; margin: 0; width: min(920px, 100%); background: #fff; border-radius: 14px; padding: 16px; }
-.gallery-lightbox__content img { display: block; width: 100%; max-height: min(78vh, 780px); object-fit: contain; border-radius: 10px; }
-.gallery-lightbox__content figcaption { color: #526057; font-size: .95rem; margin-top: 10px; padding-right: 36px; }
-.gallery-lightbox__close { position: absolute; top: 8px; right: 10px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: rgb(255 255 255 / 90%); font-size: 1.4rem; line-height: 1; cursor: pointer; }
 .text-slide h2 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 1.05; margin-block: 24px; }
 .skip-link:focus { z-index: 20; }
 @media (max-width: 760px) {
   .about-slide .about-layout { grid-template-columns: minmax(0, 1fr); }
-  .about-gallery { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-  .gallery-lightbox { padding: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -144,8 +130,7 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
   .projects-slide .project-cards { padding-top: 0; }
   .contact-form { margin-top: 0; }
   .contact-form input, .contact-form textarea { min-height: 44px; font-size: 16px; }
-  .contact-form button, .about-gallery__trigger, .gallery-lightbox__close { min-height: 44px; }
-  .gallery-lightbox__close { width: 44px; }
+  .contact-form button { min-height: 44px; }
   .legal-content { overflow-wrap: anywhere; }
   .hero { padding-block: 32px; }
 }
@@ -167,8 +152,6 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
   .skills-area h2 { font-size: clamp(2rem, 7vw, 3rem); }
   .content-card { padding: 16px; }
   .contact-form button { width: 100%; }
-  .gallery-lightbox__content { padding: 12px; }
-  .gallery-lightbox__content img { max-height: 70dvh; height: auto; }
 }
 @media (max-width: 600px) {
   :root { --footer-height: calc(96px + env(safe-area-inset-bottom, 0px)); }
@@ -176,10 +159,18 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
   .site-footer .site-nav { margin: 0; padding-block: 0; overflow: visible; }
   .site-footer .site-nav ul { justify-content: center; flex-wrap: wrap; gap: 0 20px; }
   .project-cards { grid-template-columns: minmax(0, 1fr); }
-  .about-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 1100px) {
   .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); overflow-wrap: anywhere; }
   .home-text, .about-content { overflow-wrap: anywhere; }
+}
+
+/* Reserve room below the original title position. */
+.presentation .about-slide { padding-top: 88px; align-items: flex-start; }
+@media (max-width: 1100px) { .presentation .about-slide { padding-top: 32px; } }
+
+@media (min-width: 1101px) {
+  .presentation .about-slide { width: min(1320px, calc(100% - 48px)); }
+  .presentation .about-slide .page-title { left: calc(100px - ((100vw - min(1320px, calc(100vw - 48px))) / 2)); }
 }
