@@ -183,3 +183,8 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
   .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); overflow-wrap: anywhere; }
   .home-text, .about-content { overflow-wrap: anywhere; }
 }
+
+/* The profile map scrolls with the page when its text is longer. */
+.presentation .about-slide { padding-top: 32px; align-items: flex-start; }
+.presentation .about-slide .page-title { position: static; text-align: center; margin: 0 0 32px; }
+@media (max-width: 1100px) { .presentation .about-slide .page-title { margin-bottom: 24px; } }

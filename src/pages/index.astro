@@ -4,29 +4,11 @@ import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import SkillCard from '../components/SkillCard.astro';
-import ueberMich from '../content/ueber-mich.json';
+import AboutProfile from '../components/AboutProfile.astro';
 
-interface AboutPageContent {
-  photo?: string | null;
-  photoAlt?: string;
-  content: {
-    text: string;
-    style: string;
-    fontSize?: number | null;
-    bold: boolean;
-    italic: boolean;
-    underline: boolean;
-    spaceBefore: number;
-    spaceAfter: number;
-  }[];
-  gallery: {
-    image?: string | null;
-    imageAlt?: string;
-    caption?: string;
-  }[];
-}
-
-const aboutPage: AboutPageContent = ueberMich;
+const aboutEntry = await getEntry('ueberMich', 'ueber-mich');
+if (!aboutEntry) throw new Error('Die Über-mich-Inhalte fehlen.');
+const aboutPage = aboutEntry.data;
 const homepage = await getEntry('homepage', 'homepage');
 if (!homepage) throw new Error('Die Startseiten-Inhalte fehlen.');
 const skills = await getEntry('skills', 'skills');
@@ -119,32 +101,7 @@ const backendCards = sortCardsByOrder(
   <section id="ueber-mich" class="slide text-slide about-slide" aria-labelledby="ueber-mich-title">
     <div>
       <h2 id="ueber-mich-title" class="page-title">Über Mich</h2>
-      <div class="about-layout">
-        <div class="about-photo">
-          {aboutPage.photo ? (
-            <img src={aboutPage.photo} alt={aboutPage.photoAlt ?? ''} width="800" height="800" loading="lazy" />
-          ) : (
-            <div class="content-card" aria-hidden="true">Foto folgt</div>
-          )}
-        </div>
-        <div class="content-card about-content">
-          {aboutPage.content.map(line => {
-            const className = `about-line about-line--${line.style}`;
-            const style = [
-              `--space-before: ${line.spaceBefore}px`,
-              `--space-after: ${line.spaceAfter}px`,
-              line.fontSize ? `--line-font-size: ${line.fontSize}px` : '',
-              line.bold ? 'font-weight: 800' : '',
-              line.italic ? 'font-style: italic' : '',
-              line.underline ? 'text-decoration: underline' : '',
-            ].filter(Boolean).join('; ');
-            if (line.style === 'heading1') return <h1 class={className} style={style}>{line.text}</h1>;
-            if (line.style === 'heading2') return <h2 class={className} style={style}>{line.text}</h2>;
-            if (line.style === 'heading3') return <h3 class={className} style={style}>{line.text}</h3>;
-            return <p class={className} style={style}>{line.text}</p>;
-          })}
-        </div>
-      </div>
+      <AboutProfile photo={aboutPage.photo} photoAlt={aboutPage.photoAlt} topics={aboutPage.topics} />
       {Boolean(aboutPage.gallery.length) && (
         <div class="about-gallery" aria-label="Fotostrecke">
           {aboutPage.gallery.map((item) => item.image && (

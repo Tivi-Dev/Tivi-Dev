@@ -46,16 +46,15 @@ const ueberMich = defineCollection({
   schema: z.object({
     photo: z.string().nullish(),
     photoAlt: z.string().optional(),
-    content: z.array(z.object({
-      text: z.string(),
-      style: z.enum(['heading1', 'heading2', 'heading3', 'paragraph']).default('paragraph'),
-      fontSize: z.number().int().min(8).max(200).nullable().optional(),
-      bold: z.boolean().default(false),
-      italic: z.boolean().default(false),
-      underline: z.boolean().default(false),
-      spaceBefore: z.number().int().min(0).max(300).default(0),
-      spaceAfter: z.number().int().min(0).max(300).default(16),
-    })).default([]),
+    topics: z.object({
+      profile: z.object({ title: z.string(), text: z.string().default('') }),
+      experience: z.object({ title: z.string(), text: z.string().default('') }),
+      achievements: z.object({ title: z.string(), text: z.string().default('') }),
+      education: z.object({ title: z.string(), text: z.string().default('') }),
+      skills: z.object({ title: z.string(), text: z.string().default('') }),
+      hobbies: z.object({ title: z.string(), text: z.string().default('') }),
+      contact: z.object({ title: z.string(), text: z.string().default('') }),
+    }),
     gallery: z.array(z.object({
       image: z.string().nullish(),
       imageAlt: z.string().optional(),
