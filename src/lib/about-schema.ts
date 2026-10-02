@@ -15,8 +15,8 @@ const topic = (label: string, defaultColor = '#32664b') => fields.object({
 export const aboutTopicsField = fields.object({
   profile: topic('Persönliches Profil', '#a44c2c'),
   education: topic('Ausbildung'),
-  achievements: topic('Erfolge & Zertifikate', '#88723d'),
-  skills: topic('Skills & Interessen'),
   hobbies: topic('Hobbys', '#a44c2c'),
+  skills: topic('Skills & Interessen'),
+  achievements: topic('Erfolge & Zertifikate', '#88723d'),
   experience: topic('Projekte & Praxis'),
-}, { label: 'Themen rund um dein Profilfoto', description: 'Links: Profil, Zertifikate, Hobbys. Rechts: Ausbildung, Skills, Projekte. Texte lassen sich mit der Werkzeugleiste formatieren. Leere Textfelder zeigen nur die Überschrift.' });
+}, { label: 'Themen rund um dein Profilfoto', description: 'Links: Profil, Hobbys, Zertifikate. Rechts: Ausbildung, Skills, Projekte. Texte lassen sich mit der Werkzeugleiste formatieren. Leere Textfelder zeigen nur die Überschrift.' });
