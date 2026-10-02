@@ -26,9 +26,9 @@ const renderText = (text: string) => {
   return Markdoc.renderers.html(Markdoc.transform(node, markdocConfig));
 };
 ---
-<div class="privacy-blocks legal-content">
+<div class="privacy-blocks prose legal-content content-card">
   {blocks.map((block) => (
-    <section class="privacy-block content-card" style={`--box-before: ${block.spaceBefore}px; --box-after: ${block.spaceAfter}px; --heading-gap: ${block.headingGap}px; --paragraph-gap: ${block.paragraphGap}px`}>
+    <section class="privacy-block" style={`--box-before: ${block.spaceBefore}px; --box-after: ${block.spaceAfter}px; --heading-gap: ${block.headingGap}px; --paragraph-gap: ${block.paragraphGap}px`}>
       {block.article.trim() && <h2>{block.article}</h2>}
       {block.heading.trim() && <h3>{block.heading}</h3>}
       <div class="privacy-block__text" set:html={renderText(block.text)} />
