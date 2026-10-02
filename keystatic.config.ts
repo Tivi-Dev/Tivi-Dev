@@ -1,6 +1,7 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 import { block } from '@keystatic/core/content-components';
 import './src/styles/keystatic-editor.css';
+import { privacySingleton } from './src/lib/privacy-schema';
 
 const createCardSchema = (isSkillArea: boolean) => ({
   title: fields.slug({ name: { label: 'Kartentitel' } }),
@@ -46,7 +47,7 @@ export default config({
   },
   singletons: {
     settings: singleton({
-      label: 'Website-Einstellungen',
+      label: 'Header',
       path: 'src/content/settings',
       format: { data: 'json' },
       schema: {
@@ -113,28 +114,8 @@ export default config({
           }),
         }, { layout: [12, 3, 2, 1, 1, 1, 2, 2] }), {
           label: 'Seiteninhalt links',
-          description: 'Item 1 ist Zeile 1, Item 2 ist Zeile 2 und so weiter. Die Reihenfolge kann per Ziehen geändert werden.',
-        }),
-      },
-    }),
-    menuebar: singleton({
-      label: 'Menübar',
-      path: 'src/content/menuebar',
-      format: { data: 'json' },
-      schema: {
-        links: fields.array(fields.object({
-          label: fields.text({
-            label: 'Linktext',
-            validation: { isRequired: true },
-          }),
-          href: fields.text({
-            label: 'Ziel (URL oder Anker)',
-            validation: { isRequired: true },
-            description: 'Beispiele: /#home, /impressum/',
-          }),
-        }), {
-          label: 'Menülinks',
-          itemLabel: (props) => props.fields.label.value || 'Neuer Link',
+          description: 'Die Einträge zeigen ihren Textinhalt und können per Ziehen neu angeordnet werden.',
+          itemLabel: (props) => props.fields.text.value.replace(/\s+/g, ' ').trim() || 'Neue Textzeile',
         }),
       },
     }),
@@ -275,15 +256,7 @@ export default config({
         content: legalDocumentField,
       },
     }),
-    datenschutz: singleton({
-      label: 'Datenschutz',
-      path: 'src/content/legal/datenschutz',
-      format: { contentField: 'content' },
-      schema: {
-        title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
-        content: legalDocumentField,
-      },
-    }),
+    datenschutz: privacySingleton,
   },
   collections: {
     frontendCards: collection({

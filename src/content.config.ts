@@ -61,6 +61,22 @@ const legal = defineCollection({
   schema: z.object({ title: z.string() }),
 });
 
+const privacy = defineCollection({
+  loader: glob({ pattern: 'datenschutz.json', base: './src/content/legal' }),
+  schema: z.object({
+    title: z.string(),
+    blocks: z.array(z.object({
+      article: z.string().default(''),
+      heading: z.string().default(''),
+      text: z.string().default(''),
+      spaceBefore: z.number().int().min(0).max(300).default(0),
+      spaceAfter: z.number().int().min(0).max(300).default(32),
+      headingGap: z.number().int().min(0).max(300).default(12),
+      paragraphGap: z.number().int().min(0).max(300).default(10),
+    })).default([]),
+  }),
+});
+
 const cardSchema = z.object({
   title: z.string(),
   description: z.string().default(''),
@@ -126,4 +142,4 @@ const frontendCards = createCardCollection('frontend', validateSkillCardIcon);
 const backendCards = createCardCollection('backend', validateSkillCardIcon);
 const projectCards = createCardCollection('projekte');
 
-export const collections = { homepage, skills, ueberMich, legal, frontendCards, backendCards, projectCards };
+export const collections = { homepage, skills, ueberMich, legal, privacy, frontendCards, backendCards, projectCards };

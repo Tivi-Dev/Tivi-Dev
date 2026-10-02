@@ -2,11 +2,10 @@
 import '@fontsource-variable/manrope';
 import '../styles/global.css';
 import settings from '../content/settings.json';
-import menuebar from '../content/menuebar.json';
 import footer from '../content/footer.json';
 interface Props { title: string; description: string; presentation?: boolean }
 const { title, description, presentation = false } = Astro.props;
-const defaultMainLinks = [
+const mainLinks = [
   { label: 'Home', href: '/#home' },
   { label: 'Skills', href: '/#skills' },
   { label: 'Projekte', href: '/#projekte' },
@@ -17,7 +16,6 @@ const defaultFooterLinks = [
   { label: 'Impressum', href: '/impressum/' },
   { label: 'Datenschutz', href: '/datenschutz/' },
 ];
-const mainLinks = menuebar.links.length ? menuebar.links : defaultMainLinks;
 const footerLinks = footer.links.length ? footer.links : defaultFooterLinks;
 ---
 <!doctype html>

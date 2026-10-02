@@ -12,13 +12,16 @@ npm run dev
 - Website: http://127.0.0.1:4321
 - Inhalte bearbeiten: http://127.0.0.1:4321/keystatic
 
-Unter **Startseite** lassen sich Seitentitel, Suchmaschinenbeschreibung, Foto und der linke Seiteninhalt bearbeiten. Der Seiteninhalt besteht aus nummerierten Zeilen mit eigenem Textstil, Schriftgröße, Fett-/Kursiv-/Unterstreichung sowie individuellem Abstand nach oben und unten.
-Zusätzlich gibt es Singletons für **Menübar**, **Footer**, **Skills**, **Projekte**, **Über mich**, **Kontakt**, **Impressum** und **Datenschutz**.
+Unter **Startseite** lassen sich Seitentitel, Suchmaschinenbeschreibung, Foto und der linke Seiteninhalt bearbeiten. Der Seiteninhalt besteht aus Textzeilen mit Inhaltsvorschau, eigenem Textstil, Schriftgröße, Fett-/Kursiv-/Unterstreichung sowie individuellem Abstand nach oben und unten.
+Zusätzlich gibt es Singletons für **Header**, **Footer**, **Skills**, **Projekte**, **Über mich**, **Kontakt**, **Impressum** und **Datenschutz**.
+Unter **Header** lässt sich der Website-Titel bearbeiten. Die Menüpunkte Home, Skills, Projekte, Über Mich und Kontakt sind fest in `src/layouts/BaseLayout.astro` hinterlegt.
 Für Karten in den Bereichen **Frontend** und **Backend** dürfen als Icons ausschließlich SVG-Dateien verwendet werden.
 Im Singleton **Skills** kann die Reihenfolge der Karten für **Frontend** und **Backend** getrennt festgelegt werden (über Slugs in Wunschreihenfolge).
 Die Karten sind in Keystatic als drei getrennte Collections organisiert: **Karten · Frontend**, **Karten · Backend** und **Karten · Projekte**.
 Im Singleton **Über mich** können ein linkes Hauptfoto, der rechte Textbereich und eine Fotostrecke unterhalb gepflegt werden.
 Die Startseite nutzt einen Präsentationsmodus: Beim Scrollen wird abschnittsweise „gesnapt“ (Home, Skills, Projekte, Über Mich, Kontakt). Zusätzlich funktionieren Navigation per Mausrad/Trackpad, Pfeiltasten, Bild↑/Bild↓, Pos1/Ende sowie die Menülinks mit sanften Übergängen.
+
+Im Singleton **Datenschutz** wird der Inhalt über verschiebbare Boxen mit **Artikel**, **Überschrift** und **Text** bearbeitet. Der Texteditor unterstützt unter anderem Fett, Kursiv, Unterstreichen, Links, Listen und Tabellen. Pro Box lassen sich die Abstände davor, danach, unter den Überschriften und zwischen Textabsätzen einstellen. Die Inhalte werden in `src/content/legal/datenschutz.json` gespeichert.
 
 ## Befehle
 
