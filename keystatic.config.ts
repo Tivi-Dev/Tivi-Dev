@@ -46,7 +46,7 @@ export default config({
   },
   singletons: {
     settings: singleton({
-      label: 'Website-Einstellungen',
+      label: 'Header',
       path: 'src/content/settings',
       format: { data: 'json' },
       schema: {
@@ -114,27 +114,6 @@ export default config({
         }, { layout: [12, 3, 2, 1, 1, 1, 2, 2] }), {
           label: 'Seiteninhalt links',
           description: 'Item 1 ist Zeile 1, Item 2 ist Zeile 2 und so weiter. Die Reihenfolge kann per Ziehen geändert werden.',
-        }),
-      },
-    }),
-    menuebar: singleton({
-      label: 'Menübar',
-      path: 'src/content/menuebar',
-      format: { data: 'json' },
-      schema: {
-        links: fields.array(fields.object({
-          label: fields.text({
-            label: 'Linktext',
-            validation: { isRequired: true },
-          }),
-          href: fields.text({
-            label: 'Ziel (URL oder Anker)',
-            validation: { isRequired: true },
-            description: 'Beispiele: /#home, /impressum/',
-          }),
-        }), {
-          label: 'Menülinks',
-          itemLabel: (props) => props.fields.label.value || 'Neuer Link',
         }),
       },
     }),
