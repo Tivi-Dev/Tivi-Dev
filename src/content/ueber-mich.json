@@ -30,12 +30,5 @@
       "title": "Kontakt",
       "text": "[Schreib mir über das Kontaktformular](#kontakt)."
     }
-  },
-  "gallery": [
-    {
-      "image": "/images/ueber-mich/gallery/gallery/0/image.png",
-      "imageAlt": "Python Zertifikat",
-      "caption": "Python Zertifikat"
-    }
-  ]
+  }
 }

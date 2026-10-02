@@ -1,6 +1,5 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
-import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import SkillCard from '../components/SkillCard.astro';
@@ -20,8 +19,6 @@ const photoAspect = photoSettings.shape === 'circle' ? '1 / 1'
   : { portrait: '4 / 5', square: '1 / 1', landscape: '4 / 3' }[photoSettings.aspect];
 const photoRadius = { rounded: '16px', rectangle: '0', circle: '50%' }[photoSettings.shape];
 const photoStyle = `--photo-width: ${photoSettings.size}%; --photo-aspect: ${photoAspect}; --photo-radius: ${photoRadius}; --photo-zoom: ${photoSettings.zoom / 100}; --photo-x: ${photoSettings.positionX}%; --photo-y: ${photoSettings.positionY}%`;
-const hasGalleryImages = aboutPage.gallery.some((item) => Boolean(item.image));
-const firstGalleryImage = aboutPage.gallery.find((item) => item.image)?.image ?? photo ?? '';
 
 const sortCardsByOrder = (
   sectionCards: typeof frontendCardsRaw | typeof backendCardsRaw,
@@ -102,25 +99,6 @@ const backendCards = sortCardsByOrder(
     <div>
       <h2 id="ueber-mich-title" class="page-title">Über Mich</h2>
       <AboutProfile photo={aboutPage.photo} photoAlt={aboutPage.photoAlt} topics={aboutPage.topics} />
-      {Boolean(aboutPage.gallery.length) && (
-        <div class="about-gallery" aria-label="Fotostrecke">
-          {aboutPage.gallery.map((item) => item.image && (
-            <figure class="content-card about-gallery__item">
-              <button
-                class="about-gallery__trigger"
-                type="button"
-                data-gallery-image={item.image}
-                data-gallery-alt={item.imageAlt ?? ''}
-                data-gallery-caption={item.caption ?? ''}
-                aria-label={`Bild vergrößern${item.caption ? `: ${item.caption}` : ''}`}
-              >
-                <img src={item.image} alt={item.imageAlt ?? ''} loading="lazy" />
-              </button>
-              {item.caption && <figcaption>{item.caption}</figcaption>}
-            </figure>
-          ))}
-        </div>
-      )}
     </div>
   </section>
   <section id="kontakt" class="slide text-slide" aria-labelledby="kontakt-title">
@@ -148,16 +126,6 @@ const backendCards = sortCardsByOrder(
       </form>
     </div>
   </section>
-  {hasGalleryImages && (
-    <div class="gallery-lightbox" hidden data-gallery-lightbox>
-      <div class="gallery-lightbox__backdrop" data-gallery-close></div>
-      <figure class="gallery-lightbox__content">
-        <Image src={firstGalleryImage} alt="" width={1200} height={900} data-gallery-preview />
-        <figcaption data-gallery-caption></figcaption>
-        <button class="gallery-lightbox__close" type="button" data-gallery-close aria-label="Vollbild schließen">×</button>
-      </figure>
-    </div>
-  )}
 </BaseLayout>
 
 <script>
@@ -220,9 +188,9 @@ const backendCards = sortCardsByOrder(
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (!canUsePresentation() || event.ctrlKey || event.metaKey || document.querySelector('[data-gallery-lightbox]:not([hidden])')) return;
+      if (!canUsePresentation() || event.ctrlKey || event.metaKey) return;
       const target = event.target as HTMLElement | null;
-      if (target?.closest('textarea, input, select, .site-header, .gallery-lightbox')) return;
+      if (target?.closest('textarea, input, select, .site-header')) return;
       const bounds = slides[currentIndex].getBoundingClientRect();
       const footerHeight = document.querySelector<HTMLElement>('.site-footer')?.offsetHeight ?? 0;
       if ((event.deltaY > 0 && bounds.bottom > window.innerHeight - footerHeight + 2)
@@ -237,7 +205,7 @@ const backendCards = sortCardsByOrder(
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (!canUsePresentation() || document.querySelector('[data-gallery-lightbox]:not([hidden])')) return;
+      if (!canUsePresentation()) return;
       const target = event.target as HTMLElement | null;
       if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(target.tagName))) return;
 
@@ -292,42 +260,6 @@ const backendCards = sortCardsByOrder(
     if (!initialHash) updateActive();
   }
 
-  const galleryLightbox = document.querySelector<HTMLElement>('[data-gallery-lightbox]');
-  const galleryPreview = galleryLightbox?.querySelector<HTMLImageElement>('[data-gallery-preview]');
-  const galleryCaption = galleryLightbox?.querySelector<HTMLElement>('[data-gallery-caption]');
-  const galleryTriggers = document.querySelectorAll<HTMLButtonElement>('.about-gallery__trigger');
-  const galleryCloseControls = galleryLightbox?.querySelectorAll<HTMLElement>('[data-gallery-close]');
-
-  const closeGalleryLightbox = () => {
-    if (!galleryLightbox) return;
-    galleryLightbox.hidden = true;
-    document.body.style.overflow = '';
-  };
-
-  if (galleryLightbox && galleryPreview && galleryCaption && galleryTriggers.length) {
-    galleryTriggers.forEach((trigger) => {
-      trigger.addEventListener('click', () => {
-        const image = trigger.dataset.galleryImage;
-        if (!image) return;
-        galleryPreview.srcset = '';
-        galleryPreview.src = image;
-        galleryPreview.alt = trigger.dataset.galleryAlt ?? '';
-        galleryCaption.textContent = trigger.dataset.galleryCaption ?? '';
-        galleryLightbox.hidden = false;
-        document.body.style.overflow = 'hidden';
-      });
-    });
-
-    galleryCloseControls?.forEach((control) => {
-      control.addEventListener('click', closeGalleryLightbox);
-    });
-
-    window.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && !galleryLightbox.hidden) {
-        closeGalleryLightbox();
-      }
-    });
-  }
 </script>
 
 <script>

@@ -55,11 +55,6 @@ const ueberMich = defineCollection({
       hobbies: z.object({ title: z.string(), text: z.string().default('') }),
       contact: z.object({ title: z.string(), text: z.string().default('') }),
     }),
-    gallery: z.array(z.object({
-      image: z.string().nullish(),
-      imageAlt: z.string().optional(),
-      caption: z.string().optional(),
-    })).default([]),
   }),
 });
 

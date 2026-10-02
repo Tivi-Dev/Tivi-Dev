@@ -225,18 +225,6 @@ export default config({
         }),
         photoAlt: fields.text({ label: 'Bildbeschreibung Profilfoto' }),
         topics: aboutTopicsField,
-        gallery: fields.array(fields.object({
-          image: fields.image({
-            label: 'Galeriebild',
-            directory: 'public/images/ueber-mich/gallery',
-            publicPath: '/images/ueber-mich/gallery/',
-          }),
-          imageAlt: fields.text({ label: 'Bildbeschreibung' }),
-          caption: fields.text({ label: 'Beschriftung' }),
-        }), {
-          label: 'Fotostrecke unten',
-          itemLabel: (props) => props.fields.caption.value || 'Bild',
-        }),
       },
     }),
     kontakt: singleton({
