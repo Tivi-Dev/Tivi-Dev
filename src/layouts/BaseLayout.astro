@@ -30,9 +30,10 @@ const footerLinks = footer.links.length ? footer.links : defaultFooterLinks;
   </head>
   <body class:list={{ 'presentation-page': presentation }}>
     <a class="skip-link" href="#inhalt">Zum Inhalt</a>
-    <header class="site-header">
+    <header class="site-header" data-nav-open="false">
       <a class="site-title" href="/">{settings.websiteTitle}</a>
-      <nav class="site-nav" aria-label="Hauptnavigation">
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">Menü</button>
+      <nav id="main-navigation" class="site-nav" aria-label="Hauptnavigation">
         <ul>
           {mainLinks.map(({ label, href }) => (
             <li><a href={href} aria-current={Astro.url.pathname.replace(/\/$/, '') === href.replace(/\/$/, '') ? 'page' : undefined}>{label}</a></li>
@@ -53,3 +54,37 @@ const footerLinks = footer.links.length ? footer.links : defaultFooterLinks;
     </footer>
   </body>
 </html>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.site-header');
+  const toggle = header?.querySelector<HTMLButtonElement>('.nav-toggle');
+  const navigation = header?.querySelector<HTMLElement>('#main-navigation');
+  if (header && toggle && navigation) {
+    const closeMenu = () => {
+      header.dataset.navOpen = 'false';
+      toggle.setAttribute('aria-expanded', 'false');
+    };
+    toggle.addEventListener('click', () => {
+      const open = header.dataset.navOpen !== 'true';
+      header.dataset.navOpen = String(open);
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+    navigation.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a')) closeMenu();
+    }, { capture: true });
+    header.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && header.dataset.navOpen === 'true') {
+        closeMenu();
+        toggle.focus();
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (!header.contains(event.target as Node)) closeMenu();
+    });
+    window.matchMedia('(max-width: 1100px)').addEventListener('change', closeMenu);
+    header.classList.add('navigation-ready');
+    new ResizeObserver(() => {
+      document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
+    }).observe(header);
+  }
+</script>

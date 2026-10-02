@@ -70,6 +70,51 @@ export default config({
           publicPath: '/images/homepage/',
         }),
         photoAlt: fields.text({ label: 'Bildbeschreibung', description: 'Beschreibe kurz, was auf dem Foto zu sehen ist.' }),
+        photoSettings: fields.object({
+          size: fields.integer({
+            label: 'Fotogröße (%)',
+            description: '100 % nutzt die verfügbare Breite. Kleinere Werte verkleinern das Foto.',
+            defaultValue: 100,
+            validation: { isRequired: true, min: 20, max: 100 },
+          }),
+          aspect: fields.select({
+            label: 'Bildformat',
+            options: [
+              { label: 'Hochformat (4:5)', value: 'portrait' },
+              { label: 'Quadratisch (1:1)', value: 'square' },
+              { label: 'Querformat (4:3)', value: 'landscape' },
+            ],
+            defaultValue: 'portrait',
+          }),
+          shape: fields.select({
+            label: 'Rahmenform',
+            description: 'Ein runder Rahmen verwendet immer einen quadratischen Bildbereich.',
+            options: [
+              { label: 'Rechteck mit runden Ecken (wie bisher)', value: 'rounded' },
+              { label: 'Rechteck mit geraden Ecken', value: 'rectangle' },
+              { label: 'Rund / Kreis', value: 'circle' },
+            ],
+            defaultValue: 'rounded',
+          }),
+          zoom: fields.integer({
+            label: 'Ausschnitt: Vergrößerung (%)',
+            description: '100 % füllt den Rahmen. Höhere Werte zoomen näher ins Bild.',
+            defaultValue: 100,
+            validation: { isRequired: true, min: 100, max: 250 },
+          }),
+          positionX: fields.integer({
+            label: 'Ausschnitt: horizontal (%)',
+            description: '0 = links, 50 = mittig, 100 = rechts.',
+            defaultValue: 50,
+            validation: { isRequired: true, min: 0, max: 100 },
+          }),
+          positionY: fields.integer({
+            label: 'Ausschnitt: vertikal (%)',
+            description: '0 = oben, 50 = mittig, 100 = unten.',
+            defaultValue: 50,
+            validation: { isRequired: true, min: 0, max: 100 },
+          }),
+        }, { label: 'Foto: Größe, Rahmen & Ausschnitt' }),
         content: fields.array(fields.object({
           text: fields.text({
             label: 'Text der Zeile',

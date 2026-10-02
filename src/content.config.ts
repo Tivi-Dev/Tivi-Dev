@@ -12,6 +12,14 @@ const homepage = defineCollection({
     description: z.string(),
     photo: z.string().nullish(),
     photoAlt: z.string().optional(),
+    photoSettings: z.object({
+      size: z.number().int().min(20).max(100).default(100),
+      aspect: z.enum(['portrait', 'square', 'landscape']).default('portrait'),
+      shape: z.enum(['rounded', 'rectangle', 'circle']).default('rounded'),
+      zoom: z.number().int().min(100).max(250).default(100),
+      positionX: z.number().int().min(0).max(100).default(50),
+      positionY: z.number().int().min(0).max(100).default(50),
+    }).default({ size: 100, aspect: 'portrait', shape: 'rounded', zoom: 100, positionX: 50, positionY: 50 }),
     content: z.array(z.object({
       text: z.string(),
       style: z.enum(['heading1', 'heading2', 'heading3', 'paragraph']).default('paragraph'),
