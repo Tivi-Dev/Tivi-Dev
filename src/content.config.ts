@@ -41,18 +41,24 @@ const skills = defineCollection({
   }),
 });
 
+const aboutTopicSchema = (defaultColor: string) => z.object({
+  title: z.string(),
+  text: z.string().default(''),
+  lineColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Bitte einen Hex-Farbcode mit sechs Zeichen verwenden.').default(defaultColor),
+});
+
 const ueberMich = defineCollection({
   loader: glob({ pattern: 'ueber-mich.json', base: './src/content' }),
   schema: z.object({
     photo: z.string().nullish(),
     photoAlt: z.string().optional(),
     topics: z.object({
-      profile: z.object({ title: z.string(), text: z.string().default('') }),
-      experience: z.object({ title: z.string(), text: z.string().default('') }),
-      achievements: z.object({ title: z.string(), text: z.string().default('') }),
-      education: z.object({ title: z.string(), text: z.string().default('') }),
-      skills: z.object({ title: z.string(), text: z.string().default('') }),
-      hobbies: z.object({ title: z.string(), text: z.string().default('') }),
+      profile: aboutTopicSchema('#a44c2c'),
+      experience: aboutTopicSchema('#32664b'),
+      achievements: aboutTopicSchema('#88723d'),
+      education: aboutTopicSchema('#32664b'),
+      skills: aboutTopicSchema('#32664b'),
+      hobbies: aboutTopicSchema('#a44c2c'),
     }),
   }),
 });
