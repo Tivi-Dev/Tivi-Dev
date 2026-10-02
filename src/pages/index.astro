@@ -179,7 +179,7 @@ const skillSections = skillGroups.map(group => ({
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (!canUsePresentation() || event.ctrlKey || event.metaKey) return;
+      if (!canUsePresentation() || event.ctrlKey || event.metaKey || document.querySelector('dialog[open]')) return;
       const target = event.target as HTMLElement | null;
       if (target?.closest('textarea, input, select, .site-header')) return;
       const bounds = slides[currentIndex].getBoundingClientRect();
@@ -196,7 +196,7 @@ const skillSections = skillGroups.map(group => ({
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (!canUsePresentation()) return;
+      if (!canUsePresentation() || document.querySelector('dialog[open]')) return;
       const target = event.target as HTMLElement | null;
       if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(target.tagName))) return;
 
