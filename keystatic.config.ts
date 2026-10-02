@@ -6,7 +6,10 @@ import { aboutTopicsField } from './src/lib/about-schema';
 import { privacySingleton } from './src/lib/privacy-schema';
 
 const createCardSchema = (isSkillArea: boolean) => ({
-  title: fields.slug({ name: { label: 'Kartentitel' } }),
+  title: fields.slug({ name: { label: isSkillArea ? 'Kartenkennung (beim Anlegen)' : 'Kartentitel', ...(isSkillArea ? { description: 'Die Kennung wird für Zuordnungen verwendet. Zum Umbenennen den Kartentitel darunter ändern.' } : {}) } }),
+  ...(isSkillArea ? {
+    displayTitle: fields.text({ label: 'Kartentitel (Anzeige)', description: 'Ändert den sichtbaren Namen ohne die Kartenkennung zu ändern. Leer: bisheriger Kartenname.' }),
+  } : {}),
   description: fields.text({ label: 'Beschreibung', multiline: true }),
   image: fields.image({
     label: 'Kartenbild / Icon (optional)',

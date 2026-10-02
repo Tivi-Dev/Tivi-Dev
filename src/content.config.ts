@@ -92,6 +92,7 @@ const privacy = defineCollection({
 
 const cardSchema = z.object({
   title: z.string(),
+  displayTitle: z.string().optional(),
   description: z.string().default(''),
   image: z.string().nullish(),
   imageAlt: z.string().optional(),
