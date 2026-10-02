@@ -69,7 +69,7 @@ const backendCards = sortCardsByOrder(
           const style = [
             `--space-before: ${line.spaceBefore}px`,
             `--space-after: ${line.spaceAfter}px`,
-            line.fontSize ? `font-size: ${line.fontSize}px` : '',
+            line.fontSize ? `--line-font-size: ${line.fontSize}px` : '',
             line.bold ? 'font-weight: 800' : '',
             line.italic ? 'font-style: italic' : '',
             line.underline ? 'text-decoration: underline' : '',
@@ -118,7 +118,7 @@ const backendCards = sortCardsByOrder(
       <div class="about-layout">
         <div class="about-photo">
           {aboutPage.photo ? (
-            <img src={aboutPage.photo} alt={aboutPage.photoAlt ?? ''} loading="lazy" />
+            <img src={aboutPage.photo} alt={aboutPage.photoAlt ?? ''} width="800" height="800" loading="lazy" />
           ) : (
             <div class="content-card" aria-hidden="true">Foto folgt</div>
           )}
@@ -129,7 +129,7 @@ const backendCards = sortCardsByOrder(
             const style = [
               `--space-before: ${line.spaceBefore}px`,
               `--space-after: ${line.spaceAfter}px`,
-              line.fontSize ? `font-size: ${line.fontSize}px` : '',
+              line.fontSize ? `--line-font-size: ${line.fontSize}px` : '',
               line.bold ? 'font-weight: 800' : '',
               line.italic ? 'font-style: italic' : '',
               line.underline ? 'text-decoration: underline' : '',
@@ -208,6 +208,10 @@ const backendCards = sortCardsByOrder(
     const links = document.querySelectorAll<HTMLAnchorElement>('.site-header nav a');
     const header = document.querySelector<HTMLElement>('.site-header');
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const presentationQuery = window.matchMedia('(min-width: 1101px) and (pointer: fine)');
+    const canUsePresentation = () => presentationQuery.matches && !reducedMotionQuery.matches;
+    const initialHash = location.hash;
+    let pendingInitialAlignment = Boolean(initialHash);
     let frame = 0;
     let currentIndex = 0;
     let isNavigating = false;
@@ -224,7 +228,7 @@ const backendCards = sortCardsByOrder(
     };
     const goToSlide = (targetIndex: number) => {
       const nextIndex = Math.max(0, Math.min(targetIndex, slides.length - 1));
-      if (nextIndex === currentIndex || isNavigating) return;
+      if (isNavigating) return;
       currentIndex = nextIndex;
       isNavigating = true;
       clearTimeout(unlockTimer);
@@ -238,22 +242,30 @@ const backendCards = sortCardsByOrder(
       goToSlide(currentIndex + offset);
     };
     const updateActive = () => {
+      if (isNavigating) { frame = 0; return; }
       const top = header?.getBoundingClientRect().bottom ?? 0;
-      const active = slides.reduce((closest, slide) =>
-        Math.abs(slide.getBoundingClientRect().top - top) < Math.abs(closest.getBoundingClientRect().top - top) ? slide : closest,
-      );
+      const active = slides.find((slide) => {
+        const bounds = slide.getBoundingClientRect();
+        return bounds.top <= top + 2 && bounds.bottom > top + 2;
+      }) ?? slides[0];
       const index = slides.indexOf(active);
       if (index >= 0) currentIndex = index;
       links.forEach(link => {
         if (link.hash === `#${active.id}`) link.setAttribute('aria-current', 'location');
         else link.removeAttribute('aria-current');
       });
-      if (location.hash !== `#${active.id}`) history.replaceState(null, '', `#${active.id}`);
+      if (!pendingInitialAlignment && location.hash !== `#${active.id}`) history.replaceState(null, '', `#${active.id}`);
       frame = 0;
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (reducedMotionQuery.matches || event.ctrlKey || event.metaKey) return;
+      if (!canUsePresentation() || event.ctrlKey || event.metaKey || document.querySelector('[data-gallery-lightbox]:not([hidden])')) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('textarea, input, select, .site-header, .gallery-lightbox')) return;
+      const bounds = slides[currentIndex].getBoundingClientRect();
+      const footerHeight = document.querySelector<HTMLElement>('.site-footer')?.offsetHeight ?? 0;
+      if ((event.deltaY > 0 && bounds.bottom > window.innerHeight - footerHeight + 2)
+        || (event.deltaY < 0 && bounds.top < (header?.offsetHeight ?? 0) - 2)) return;
       wheelDelta += event.deltaY;
       clearTimeout(wheelResetTimer);
       wheelResetTimer = window.setTimeout(() => { wheelDelta = 0; }, 120);
@@ -264,9 +276,9 @@ const backendCards = sortCardsByOrder(
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (reducedMotionQuery.matches) return;
+      if (!canUsePresentation() || document.querySelector('[data-gallery-lightbox]:not([hidden])')) return;
       const target = event.target as HTMLElement | null;
-      if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) return;
+      if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(target.tagName))) return;
 
       if (event.key === 'ArrowDown' || event.key === 'PageDown' || event.key === ' ') {
         event.preventDefault();
@@ -286,24 +298,37 @@ const backendCards = sortCardsByOrder(
     window.addEventListener('scroll', () => {
       if (!frame) frame = requestAnimationFrame(updateActive);
     }, { passive: true });
+    window.addEventListener('hashchange', () => {
+      const targetIndex = slides.findIndex(slide => `#${slide.id}` === location.hash);
+      if (targetIndex >= 0) goToSlide(targetIndex);
+    });
     window.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('keydown', onKeyDown);
 
     links.forEach(link => link.addEventListener('click', event => {
-      if (!link.hash) return;
-      event.preventDefault();
+      if (!link.hash || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       const targetIndex = slides.findIndex(slide => `#${slide.id}` === link.hash);
-      if (targetIndex >= 0) goToSlide(targetIndex);
+      if (targetIndex < 0) return;
+      event.preventDefault();
+      goToSlide(targetIndex);
     }));
 
-    if (location.hash) {
-      const targetIndex = slides.findIndex(slide => `#${slide.id}` === location.hash);
+    if (initialHash) {
+      const targetIndex = slides.findIndex(slide => `#${slide.id}` === initialHash);
       if (targetIndex >= 0) {
         currentIndex = targetIndex;
-        requestAnimationFrame(() => scrollToSection(location.hash, 'auto'));
+        const alignInitialSection = () => {
+          scrollToSection(initialHash, 'instant');
+          requestAnimationFrame(() => {
+            pendingInitialAlignment = false;
+            updateActive();
+          });
+        };
+        if (document.readyState === 'complete') void document.fonts.ready.then(alignInitialSection);
+        else window.addEventListener('load', () => { void document.fonts.ready.then(alignInitialSection); }, { once: true });
       }
     }
-    updateActive();
+    if (!initialHash) updateActive();
   }
 
   const galleryLightbox = document.querySelector<HTMLElement>('[data-gallery-lightbox]');

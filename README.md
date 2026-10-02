@@ -19,7 +19,8 @@ Für Karten in den Bereichen **Frontend** und **Backend** dürfen als Icons auss
 Im Singleton **Skills** kann die Reihenfolge der Karten für **Frontend** und **Backend** getrennt festgelegt werden (über Slugs in Wunschreihenfolge).
 Die Karten sind in Keystatic als drei getrennte Collections organisiert: **Karten · Frontend**, **Karten · Backend** und **Karten · Projekte**.
 Im Singleton **Über mich** können ein linkes Hauptfoto, der rechte Textbereich und eine Fotostrecke unterhalb gepflegt werden.
-Die Startseite nutzt einen Präsentationsmodus: Beim Scrollen wird abschnittsweise „gesnapt“ (Home, Skills, Projekte, Über Mich, Kontakt). Zusätzlich funktionieren Navigation per Mausrad/Trackpad, Pfeiltasten, Bild↑/Bild↓, Pos1/Ende sowie die Menülinks mit sanften Übergängen.
+Auf Handy und Tablet passt sich das Layout automatisch an: Navigation über ein aufklappbares Menü, angepasste Schriftgrößen und Kartenraster sowie normales Scrollen für lange Inhalte. Der Footer bleibt sichtbar; rechtliche Seiten und Kontaktformular passen sich ebenfalls an kleine Bildschirme an.
+Die Startseite nutzt auf großen Bildschirmen mit Maus einen Präsentationsmodus: Beim Scrollen wird abschnittsweise „gesnapt“ (Home, Skills, Projekte, Über Mich, Kontakt). Zusätzlich funktionieren Navigation per Mausrad/Trackpad, Pfeiltasten, Bild↑/Bild↓, Pos1/Ende sowie die Menülinks mit sanften Übergängen.
 
 Im Singleton **Datenschutz** wird der Inhalt über verschiebbare Boxen mit **Artikel**, **Überschrift** und **Text** bearbeitet. Der Texteditor unterstützt unter anderem Fett, Kursiv, Unterstreichen, Links, Listen und Tabellen. Pro Box lassen sich die Abstände davor, danach, unter den Überschriften und zwischen Textabsätzen einstellen. Die Inhalte werden in `src/content/legal/datenschutz.json` gespeichert.
 
