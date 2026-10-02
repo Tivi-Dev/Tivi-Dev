@@ -113,7 +113,8 @@ export default config({
           }),
         }, { layout: [12, 3, 2, 1, 1, 1, 2, 2] }), {
           label: 'Seiteninhalt links',
-          description: 'Item 1 ist Zeile 1, Item 2 ist Zeile 2 und so weiter. Die Reihenfolge kann per Ziehen geändert werden.',
+          description: 'Die Einträge zeigen ihren Textinhalt und können per Ziehen neu angeordnet werden.',
+          itemLabel: (props) => props.fields.text.value.replace(/\s+/g, ' ').trim() || 'Neue Textzeile',
         }),
       },
     }),
