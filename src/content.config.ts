@@ -1,3 +1,4 @@
+import { aboutIconNames, type AboutIconName } from './lib/about-icons';
 import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
 import { readdir, readFile } from 'node:fs/promises';
@@ -41,9 +42,10 @@ const skills = defineCollection({
   }),
 });
 
-const aboutTopicSchema = (defaultColor: string) => z.object({
+const aboutTopicSchema = (defaultColor: string, defaultIcon: AboutIconName) => z.object({
   title: z.string(),
   text: z.string().default(''),
+  icon: z.enum(aboutIconNames).default(defaultIcon),
   lineColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Bitte einen Hex-Farbcode mit sechs Zeichen verwenden.').default(defaultColor),
 });
 
@@ -53,12 +55,12 @@ const ueberMich = defineCollection({
     photo: z.string().nullish(),
     photoAlt: z.string().optional(),
     topics: z.object({
-      profile: aboutTopicSchema('#a44c2c'),
-      experience: aboutTopicSchema('#32664b'),
-      achievements: aboutTopicSchema('#88723d'),
-      education: aboutTopicSchema('#32664b'),
-      skills: aboutTopicSchema('#32664b'),
-      hobbies: aboutTopicSchema('#a44c2c'),
+      profile: aboutTopicSchema('#a44c2c', 'person'),
+      experience: aboutTopicSchema('#32664b', 'briefcase'),
+      achievements: aboutTopicSchema('#88723d', 'trophy'),
+      education: aboutTopicSchema('#32664b', 'education'),
+      skills: aboutTopicSchema('#32664b', 'code'),
+      hobbies: aboutTopicSchema('#a44c2c', 'gamepad'),
     }),
   }),
 });
