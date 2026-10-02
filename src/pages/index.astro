@@ -3,6 +3,7 @@ import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import SkillCard from '../components/SkillCard.astro';
+import { skillGroups } from '../lib/skill-groups';
 import AboutProfile from '../components/AboutProfile.astro';
 
 const aboutEntry = await getEntry('ueberMich', 'ueber-mich');
@@ -11,8 +12,7 @@ const aboutPage = aboutEntry.data;
 const homepage = await getEntry('homepage', 'homepage');
 if (!homepage) throw new Error('Die Startseiten-Inhalte fehlen.');
 const skills = await getEntry('skills', 'skills');
-const frontendCardsRaw = await getCollection('frontendCards');
-const backendCardsRaw = await getCollection('backendCards');
+const skillCards = await getCollection('skillCards');
 const projectCards = await getCollection('projectCards');
 const { title, description, photo, photoAlt, photoSettings, content } = homepage.data;
 const photoAspect = photoSettings.shape === 'circle' ? '1 / 1'
@@ -20,27 +20,15 @@ const photoAspect = photoSettings.shape === 'circle' ? '1 / 1'
 const photoRadius = { rounded: '16px', rectangle: '0', circle: '50%' }[photoSettings.shape];
 const photoStyle = `--photo-width: ${photoSettings.size}%; --photo-aspect: ${photoAspect}; --photo-radius: ${photoRadius}; --photo-zoom: ${photoSettings.zoom / 100}; --photo-x: ${photoSettings.positionX}%; --photo-y: ${photoSettings.positionY}%`;
 
-const sortCardsByOrder = (
-  sectionCards: typeof frontendCardsRaw | typeof backendCardsRaw,
-  orderedIds: string[],
-) => {
-  if (!orderedIds.length) return sectionCards;
-  const cardMap = new Map(sectionCards.map((card) => [card.id, card]));
-  const orderedCards = orderedIds
-    .map((id) => cardMap.get(id))
-    .filter((card): card is typeof sectionCards[number] => Boolean(card));
-  const unorderedCards = sectionCards.filter((card) => !orderedIds.includes(card.id));
-  return [...orderedCards, ...unorderedCards];
-};
-
-const frontendCards = sortCardsByOrder(
-  frontendCardsRaw,
-  skills?.data.frontendOrder ?? [],
-);
-const backendCards = sortCardsByOrder(
-  backendCardsRaw,
-  skills?.data.backendOrder ?? [],
-);
+const skillCardMap = new Map(skillCards.map(card => [card.id, card]));
+const skillSections = skillGroups.map(group => ({
+  ...group,
+  cards: [...new Set(skills?.data[group.id] ?? [])].map(id => {
+    const card = skillCardMap.get(id);
+    if (!card) throw new Error(`Skills / ${group.title}: Die zugewiesene Karte „${id}“ fehlt.`);
+    return card;
+  }),
+}));
 ---
 <BaseLayout title={title} description={description} presentation>
   <section id="home" class="home-split slide" aria-label="Home">
@@ -72,20 +60,20 @@ const backendCards = sortCardsByOrder(
       )}
     </div>
   </section>
-  <section id="skills" class="slide skills-slide" aria-label="Skills">
-    <h2 class="page-title">Skills</h2>
-    <section class="skills-area" aria-labelledby="frontend-title">
-      <h2 id="frontend-title">Frontend</h2>
-      <div class="skill-cards">
-        {frontendCards.map(card => <SkillCard card={card} />)}
+  <section id="skills" class="slide skills-slide" aria-labelledby="skills-title">
+    <h2 id="skills-title" class="page-title">Skills</h2>
+    {(['top', 'bottom'] as const).map(row => (
+      <div class="skills-row">
+        {skillSections.filter(group => group.row === row).map(group => (
+          <section class="skills-area" data-skill-group={group.id} aria-labelledby={`skills-${group.id}-title`}>
+            <h3 id={`skills-${group.id}-title`}>{group.title}</h3>
+            <div class="skill-cards">
+              {group.cards.map(card => <SkillCard card={card} />)}
+            </div>
+          </section>
+        ))}
       </div>
-    </section>
-    <section class="skills-area" aria-labelledby="backend-title">
-      <h2 id="backend-title">Backend</h2>
-      <div class="skill-cards">
-        {backendCards.map(card => <SkillCard card={card} />)}
-      </div>
-    </section>
+    ))}
   </section>
   <section id="projekte" class="slide text-slide projects-slide" aria-labelledby="projekte-title">
     <div>

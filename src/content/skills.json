@@ -1,13 +1,17 @@
 {
-  "frontendOrder": [
+  "frontend": [
     "html",
     "css",
     "astro"
   ],
-  "backendOrder": [
+  "cms": [],
+  "design": [],
+  "backend": [
     "docker",
     "ubuntu-server",
-    "windows-server",
-    "python"
-  ]
+    "python",
+    "java-script"
+  ],
+  "tools": [],
+  "databases": []
 }

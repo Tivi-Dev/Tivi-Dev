@@ -37,8 +37,12 @@ const homepage = defineCollection({
 const skills = defineCollection({
   loader: glob({ pattern: 'skills.json', base: './src/content' }),
   schema: z.object({
-    frontendOrder: z.array(z.string()).default([]),
-    backendOrder: z.array(z.string()).default([]),
+    frontend: z.array(z.string()).default([]),
+    cms: z.array(z.string()).default([]),
+    design: z.array(z.string()).default([]),
+    backend: z.array(z.string()).default([]),
+    tools: z.array(z.string()).default([]),
+    databases: z.array(z.string()).default([]),
   }),
 });
 
@@ -105,13 +109,13 @@ function validateSkillCardIcon(data: unknown, filePath: string) {
     && !new URL(image, 'https://website.invalid').pathname.toLowerCase().endsWith('.svg')
   ) {
     throw new Error(
-      `${filePath}: Frontend- und Backend-Karten dürfen nur SVG-Icons verwenden.`,
+      `${filePath}: Skill-Karten dürfen nur SVG-Icons verwenden.`,
     );
   }
 }
 
 const createCardCollection = (
-  directoryName: 'frontend' | 'backend' | 'projekte',
+  directoryName: 'skills' | 'projekte',
   validateImage: (data: unknown, filePath: string) => void = () => {},
 ) => defineCollection({
   loader: {
@@ -147,8 +151,7 @@ const createCardCollection = (
   schema: cardSchema,
 });
 
-const frontendCards = createCardCollection('frontend', validateSkillCardIcon);
-const backendCards = createCardCollection('backend', validateSkillCardIcon);
+const skillCards = createCardCollection('skills', validateSkillCardIcon);
 const projectCards = createCardCollection('projekte');
 
-export const collections = { homepage, skills, ueberMich, legal, privacy, frontendCards, backendCards, projectCards };
+export const collections = { homepage, skills, ueberMich, legal, privacy, skillCards, projectCards };

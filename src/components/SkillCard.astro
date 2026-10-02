@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import '../styles/skill-card.css';
-type SkillCardEntry = CollectionEntry<'frontendCards'> | CollectionEntry<'backendCards'>;
+type SkillCardEntry = CollectionEntry<'skillCards'>;
 interface Props { card: SkillCardEntry }
 const { card } = Astro.props;
 const { title, image, imageAlt, projectUrl } = card.data;
