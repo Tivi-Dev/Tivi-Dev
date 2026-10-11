@@ -2,16 +2,28 @@
   "frontend": [
     "html",
     "css",
-    "astro"
+    "java-script",
+    "tailwind-css"
   ],
-  "cms": [],
-  "design": [],
+  "cms": [
+    "astro",
+    "keystatic"
+  ],
+  "design": [
+    "canva",
+    "google-stitch"
+  ],
   "backend": [
     "docker",
-    "ubuntu-server",
     "python",
-    "java-script"
+    "ubuntu-server"
   ],
-  "tools": [],
-  "databases": []
+  "tools": [
+    "git-hub",
+    "git",
+    "visual-studio-code"
+  ],
+  "databases": [
+    "postgres-sql"
+  ]
 }
