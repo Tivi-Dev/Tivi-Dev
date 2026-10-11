@@ -46,6 +46,14 @@ npm run preview
 
 ## Veröffentlichung
 
+GitHub Pages veröffentlicht dieses Repository unter `https://tivi-dev.github.io/Tivi-Dev/`.
+Im Produktionsbuild setzt `astro.config.mjs` deshalb `base` auf `/Tivi-Dev`.
+CSS, JavaScript und Schriften erhalten diesen Pfad beim Build automatisch;
+Bilder aus `public/` und interne Links verwenden `withBasePath` aus `src/lib/site-url.ts`.
+Die in Keystatic gespeicherten Bildpfade können weiterhin mit `/images/` beginnen.
+Lokal bleibt die Website unter `http://127.0.0.1:4321/` und Keystatic unter `/keystatic` erreichbar.
+Die Produktionsvorschau mit `npm run preview` liegt dagegen unter `/Tivi-Dev/`.
+
 Keystatic läuft zunächst lokal und benötigt kein Konto oder Zugangsdaten. Im Produktionsbuild wird die Verwaltung ausgelassen; `dist/` kann auf einem statischen Hosting veröffentlicht werden. Die Vorschau des Produktionsbuilds hat deshalb keine Inhaltsverwaltung. Für spätere Online-Bearbeitung richten wir GitHub-Speicherung und einen passenden Astro-Adapter ein.
 
 Als Nächstes legen wir Zweck, Seitenstruktur, Farben, Schriften und Inhalte fest. Die vorhandene Gestaltung ist ein neutraler Platzhalter.

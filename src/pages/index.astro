@@ -5,6 +5,7 @@ import ProjectCard from '../components/ProjectCard.astro';
 import SkillCard from '../components/SkillCard.astro';
 import { skillGroups } from '../lib/skill-groups';
 import AboutProfile from '../components/AboutProfile.astro';
+import { withBasePath } from '../lib/site-url';
 
 const aboutEntry = await getEntry('ueberMich', 'ueber-mich');
 if (!aboutEntry) throw new Error('Die Über-mich-Inhalte fehlen.');
@@ -57,7 +58,7 @@ const skillSections = skillGroups.map(group => ({
     </div>
     <div class="home-photo" style={photoStyle}>
       {photo ? (
-        <img src={photo} alt={photoAlt ?? ''} width="800" height="1000" fetchpriority="high" />
+        <img src={withBasePath(photo)} alt={photoAlt ?? ''} width="800" height="1000" fetchpriority="high" />
       ) : (
         <div class="photo-placeholder" aria-hidden="true"></div>
       )}

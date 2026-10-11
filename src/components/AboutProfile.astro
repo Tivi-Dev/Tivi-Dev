@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { aboutIcons } from '../lib/about-icons';
 import Markdoc from '@markdoc/markdoc';
+import { withBasePath } from '../lib/site-url';
 
 interface Props {
   photo?: string | null;
@@ -32,7 +33,7 @@ const renderText = (text: string) => {
   </svg>
   <div class="profile-map__portrait">
     {photo ? (
-      <img src={photo} alt={photoAlt ?? ''} width="800" height="800" loading="lazy" />
+      <img src={withBasePath(photo)} alt={photoAlt ?? ''} width="800" height="800" loading="lazy" />
     ) : (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
         <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 21v-2a7 7 0 0 1 14 0v2" />
