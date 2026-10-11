@@ -2,6 +2,7 @@
 import { getEntry, render } from 'astro:content';
 import PrivacyBlocks from '../components/PrivacyBlocks.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBasePath } from '../lib/site-url';
 
 export function getStaticPaths() {
   return [
@@ -17,7 +18,7 @@ export function getStaticPaths() {
 const { title } = Astro.props;
 const page = Astro.params.page ?? '';
 if (['skills', 'projekte', 'ueber-mich', 'kontakt'].includes(page)) {
-  return Astro.redirect(`/#${page}`);
+  return Astro.redirect(withBasePath(`/#${page}`));
 }
 const privacyEntry = page === 'datenschutz' ? await getEntry('privacy', 'datenschutz') : null;
 const legalEntry = page === 'datenschutz' ? null : await getEntry('legal', page);
