@@ -24,8 +24,14 @@ const createCardSchema = (isSkillArea: boolean) => ({
     category: fields.text({ label: 'Kategorie / Untertitel', description: 'Wird auf Projektkarten angezeigt.' }),
     author: fields.text({ label: 'Projekt: Autor' }),
     duration: fields.text({ label: 'Projekt: Zeitangabe', description: 'Optional, zum Beispiel 3 Wochen.' }),
+    details: fields.text({ label: 'Ausführliche Projektbeschreibung', multiline: true, description: 'Text im Projektfenster. Leer: die bisherige Beschreibung verwenden.' }),
+    screenshots: fields.array(fields.object({
+      image: fields.image({ label: 'Screenshot', directory: 'public/images/projects', publicPath: '/images/projects/', validation: { isRequired: true } }),
+      alt: fields.text({ label: 'Bildbeschreibung' }),
+      caption: fields.text({ label: 'Beschriftung (optional)' }),
+    }), { label: 'Screenshots', itemLabel: props => props.fields.caption.value || props.fields.alt.value || 'Screenshot' }),
   } : {}),
-  projectUrl: fields.url({ label: 'Kartenlink (optional)', description: 'Ziel beim Anklicken einer Skills- oder Projektkarte.' }),
+  projectUrl: fields.url({ label: isSkillArea ? 'Kartenlink (optional)' : 'Link zum Projekt (optional)', description: isSkillArea ? 'Ziel beim Anklicken einer Skill-Karte.' : 'Wird im Projektfenster angezeigt.' }),
 });
 
 const legalDocumentField = fields.markdoc({

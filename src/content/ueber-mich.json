@@ -4,27 +4,39 @@
   "topics": {
     "profile": {
       "title": "Persönliches Profil",
-      "text": "Hi, ich bin Tivi und mache eine Ausbildung zum Fachinformatiker für Anwendungsentwicklung."
-    },
-    "experience": {
-      "title": "Projekte & Praxis",
-      "text": "In eigenen Projekten wie InfraVision und dieser Website probiere ich neue Ideen aus und entwickle meine Fähigkeiten Schritt für Schritt weiter."
-    },
-    "achievements": {
-      "title": "Erfolge & Zertifikate",
-      "text": "[Python-Zertifikat](https://www.freecodecamp.org/certification/tivi-dev/python-v9)"
+      "icon": "person",
+      "lineColor": "#2596be",
+      "text": "Hi, ich bin Sergey,\n\n31 Jahre alt \\\naus Rheinland - Pfalz\n"
     },
     "education": {
       "title": "Ausbildung",
-      "text": "Ausbildung zum Fachinformatiker für Anwendungsentwicklung."
-    },
-    "skills": {
-      "title": "Skills & Interessen",
-      "text": "Mein besonderes Interesse gilt der Frontend-Entwicklung.\n\nIch gestalte gerne Websites und Benutzeroberflächen, bei denen Aussehen und Bedienung zusammenpassen. Dabei beschäftige ich mich mit klaren Layouts, responsivem Design und den kleinen Details, die eine Anwendung angenehm nutzbar machen."
+      "icon": "education",
+      "lineColor": "#2596be",
+      "text": "Umschulung zum Fachinformatiker für Anwendungsentwicklung seit Februar 2026\n"
     },
     "hobbies": {
       "title": "Hobbys",
-      "text": ""
+      "icon": "gamepad",
+      "lineColor": "#2596be",
+      "text": "- Sammeln von Filmen und Serien\n- Zeichnen\n- Zocken\n"
+    },
+    "skills": {
+      "title": "Interessen",
+      "icon": "code",
+      "lineColor": "#005733",
+      "text": "Mein besonderes Interesse gilt der **Frontend-Entwicklung**.\n\nIch gestalte gerne Websites und Benutzeroberflächen, bei denen Aussehen und Bedienung zusammenpassen. Dabei beschäftige ich mich mit klaren Layouts, responsivem Design und den kleinen Details, die eine Anwendung angenehm nutzbar machen.\n"
+    },
+    "achievements": {
+      "title": "Zertifikate",
+      "icon": "trophy",
+      "lineColor": "#005733",
+      "text": "[Python-Zertifikat](https://www.freecodecamp.org/certification/tivi-dev/python-v9)\n\n---\n"
+    },
+    "experience": {
+      "title": "Skills",
+      "icon": "briefcase",
+      "lineColor": "#005733",
+      "text": "In eigenen Projekten wie InfraVision und dieser Website probiere ich neue Ideen aus und entwickle meine Fähigkeiten Schritt für Schritt weiter.\n"
     }
   }
 }

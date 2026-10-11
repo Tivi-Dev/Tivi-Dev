@@ -1,12 +1,13 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { withBasePath } from '../lib/site-url';
+import ProjectDetails from './ProjectDetails.astro';
 interface Props { card: CollectionEntry<'projectCards'> }
 const { card } = Astro.props;
-const { title, description, image, imageAlt, category, author, duration, projectUrl } = card.data;
-const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undefined;
+const { title, description, image, imageAlt, category, author, duration } = card.data;
+const dialogId = `project-dialog-${card.id}`;
 ---
-<article class="project-card" tabindex={href ? undefined : 0} aria-label={title}>
+<article class="project-card" data-project-card aria-label={title}>
   <div class="project-card__image-space" aria-hidden="true"></div>
   <div class="project-card__image">
     {image ? <img src={withBasePath(image)} alt={imageAlt ?? ''} loading="lazy" width="640" height="470" /> : (
@@ -16,7 +17,7 @@ const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undef
   <div class="project-card__info">
     <span class="project-card__category">{category || 'Projekt'}</span>
     <h3 class="project-card__title">
-      {href ? <a class="project-card__link" href={href}>{title}</a> : title}
+      {title}
     </h3>
     {description && <p class="project-card__description">{description}</p>}
     {author && <p class="project-card__by">von <span>{author}</span></p>}
@@ -27,7 +28,51 @@ const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undef
       {duration}
     </span>}
   </div>
+  <button class="project-card__open" type="button" data-project-dialog={dialogId} aria-haspopup="dialog" aria-controls={dialogId} aria-label={`Projekt ${title} öffnen`}>Öffnen <span aria-hidden="true">↗</span></button>
 </article>
+<ProjectDetails card={card} dialogId={dialogId} />
+
+<script>
+  const cards = document.querySelectorAll<HTMLElement>('[data-project-card]');
+  for (const card of cards) {
+    const open = card.querySelector<HTMLButtonElement>('.project-card__open');
+    const dialog = document.getElementById(open?.dataset.projectDialog ?? '') as HTMLDialogElement | null;
+    if (!open || !dialog) continue;
+    open.addEventListener('click', () => {
+      dialog.showModal();
+      document.documentElement.classList.add('project-modal-open');
+    });
+    dialog.addEventListener('close', () => {
+      document.documentElement.classList.remove('project-modal-open');
+      open.focus({ preventScroll: true });
+    });
+    dialog.addEventListener('keydown', event => {
+      if (event.key !== 'Tab') return;
+      const controls = [...dialog.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]')].filter(control => control.getClientRects().length > 0);
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    });
+    dialog.addEventListener('click', event => {
+      if (event.target !== dialog) return;
+      const bounds = dialog.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+    });
+    const thumbnails = dialog.querySelectorAll<HTMLButtonElement>('[data-project-thumbnail]');
+    for (const thumbnail of thumbnails) {
+      thumbnail.addEventListener('click', () => {
+        for (const button of thumbnails) button.setAttribute('aria-pressed', String(button === thumbnail));
+        for (const shot of dialog.querySelectorAll<HTMLElement>('[data-project-shot]')) shot.hidden = shot.dataset.projectShot !== thumbnail.dataset.projectThumbnail;
+      });
+    }
+  }
+</script>
 
 <style>
   .project-card { position: relative; isolation: isolate; min-width: 0; border-radius: 12px; background: #fff; box-shadow: 0 13px 10px -7px rgb(0 0 0 / 10%); transition: transform .4s cubic-bezier(.175,.885,0,1), box-shadow .4s; }
@@ -36,11 +81,11 @@ const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undef
   .project-card__image img, .project-card__placeholder { display: block; width: 100%; height: 100%; object-fit: cover; }
   .project-card__placeholder { display: grid; place-items: center; background: radial-gradient(ellipse at 25% 25%, #a2c9b6, transparent 60%), linear-gradient(135deg, #274d40, #89a7ad); color: #fff; }
   .project-card__placeholder span { font-size: 3.5rem; font-weight: 700; opacity: .8; }
-  .project-card__info { padding: 20px 24px 24px; border-radius: 0 0 12px 12px; }
+  .project-card__info { padding: 20px 24px 72px; border-radius: 0 0 12px 12px; }
   .project-card__category { text-transform: uppercase; font-size: .75rem; letter-spacing: 2px; color: #66716a; }
   .project-card__title { font-size: 1.3rem; line-height: 1.35; margin: 8px 0 10px; overflow-wrap: anywhere; }
-  .project-card__link { text-decoration: none; }
-  .project-card__link::after { content: ''; position: absolute; inset: 0; border-radius: 12px; }
+  .project-card__open { position: absolute; bottom: 16px; right: 16px; z-index: 2; display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 10px 16px; border: 0; border-radius: 8px; background: #32664b; color: #fff; font: inherit; font-size: .9rem; font-weight: 700; cursor: pointer; }
+  .project-card__open:focus-visible { outline: 3px solid #32664b; outline-offset: 4px; }
   .project-card__description { font-size: .9rem; color: #526057; white-space: pre-line; overflow-wrap: anywhere; margin: 0 0 16px; }
   .project-card__by { font-size: .8rem; margin: 0; }
   .project-card__by span { color: #805836; font-weight: 700; }

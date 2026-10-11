@@ -99,6 +99,8 @@ const cardSchema = z.object({
   category: z.string().optional(),
   author: z.string().optional(),
   duration: z.string().optional(),
+  details: z.string().optional(),
+  screenshots: z.array(z.object({ image: z.string(), alt: z.string().optional(), caption: z.string().optional() })).default([]),
   projectUrl: z.string().nullish(),
 });
 
