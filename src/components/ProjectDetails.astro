@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { withBasePath } from '../lib/site-url';
 interface Props { card: CollectionEntry<'projectCards'>; dialogId: string }
 const { card, dialogId } = Astro.props;
 const { title, details, description, image, imageAlt, screenshots, projectUrl, author, duration } = card.data;
@@ -20,12 +21,12 @@ const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undef
         {shots.length ? (
           <div>
             {shots.map((shot, index) => <figure class="project-dialog__shot" data-project-shot={index} hidden={index !== 0}>
-              <div class="project-dialog__image"><img src={shot.image} alt={shot.alt?.trim() || `${title} – ${screenshots.length ? 'Screenshot' : 'Vorschau'} ${index + 1}`} loading="lazy" /></div>
+              <div class="project-dialog__image"><img src={withBasePath(shot.image)} alt={shot.alt?.trim() || `${title} – ${screenshots.length ? 'Screenshot' : 'Vorschau'} ${index + 1}`} loading="lazy" /></div>
               {shot.caption && <figcaption>{shot.caption}</figcaption>}
             </figure>)}
             {shots.length > 1 && <div class="project-dialog__thumbnails" aria-label="Screenshot auswählen">
               {shots.map((shot, index) => <button type="button" data-project-thumbnail={index} aria-pressed={index === 0 ? 'true' : 'false'} aria-label={`Screenshot ${index + 1}${shot.caption ? `: ${shot.caption}` : ''} anzeigen`}>
-                <img src={shot.image} alt="" loading="lazy" /><span>{index + 1}</span>
+                <img src={withBasePath(shot.image)} alt="" loading="lazy" /><span>{index + 1}</span>
               </button>)}
             </div>}
           </div>

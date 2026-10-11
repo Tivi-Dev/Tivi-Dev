@@ -5,6 +5,7 @@ import keystatic from "@keystatic/astro";
 
 export default defineConfig({
   site: "https://tivi-dev.github.io",
+  base: process.env.NODE_ENV === "production" ? "/Tivi-Dev" : "/",
 
   integrations: [
     react(),

@@ -3,6 +3,7 @@ import '@fontsource-variable/manrope';
 import '../styles/global.css';
 import settings from '../content/settings.json';
 import footer from '../content/footer.json';
+import { withBasePath } from '../lib/site-url';
 interface Props { title: string; description: string; presentation?: boolean }
 const { title, description, presentation = false } = Astro.props;
 const mainLinks = [
@@ -11,12 +12,13 @@ const mainLinks = [
   { label: 'Projekte', href: '/#projekte' },
   { label: 'Über Mich', href: '/#ueber-mich' },
   { label: 'Kontakt', href: '/#kontakt' },
-];
+].map(link => ({ ...link, href: withBasePath(link.href) }));
 const defaultFooterLinks = [
   { label: 'Impressum', href: '/impressum/' },
   { label: 'Datenschutz', href: '/datenschutz/' },
 ];
-const footerLinks = footer.links.length ? footer.links : defaultFooterLinks;
+const footerLinks = (footer.links.length ? footer.links : defaultFooterLinks)
+  .map(link => ({ ...link, href: withBasePath(link.href) }));
 ---
 <!doctype html>
 <html lang="de" class:list={{ 'presentation-page': presentation }}>
@@ -25,13 +27,13 @@ const footerLinks = footer.links.length ? footer.links : defaultFooterLinks;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={withBasePath('/favicon.svg')} />
     <title>{title}</title>
   </head>
   <body class:list={{ 'presentation-page': presentation }}>
     <a class="skip-link" href="#inhalt">Zum Inhalt</a>
     <header class="site-header" data-nav-open="false">
-      <a class="site-title" href="/">{settings.websiteTitle}</a>
+      <a class="site-title" href={withBasePath('/')}>{settings.websiteTitle}</a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">Menü</button>
       <nav id="main-navigation" class="site-nav" aria-label="Hauptnavigation">
         <ul>
