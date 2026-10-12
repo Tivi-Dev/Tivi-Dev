@@ -243,6 +243,7 @@ export default config({
         heading: fields.text({
           label: 'Überschrift über dem Formular',
           defaultValue: 'Schreib mir eine Nachricht',
+          multiline: false,
           validation: { isRequired: true },
         }),
         email: fields.text({ label: 'E-Mail' }),

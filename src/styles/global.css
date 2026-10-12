@@ -72,11 +72,13 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
 .content-card img { display: block; width: 100%; aspect-ratio: 16 / 10; margin-bottom: 14px; border-radius: 8px; object-fit: cover; }
 .text-slide > div { width: 100%; }
 .text-slide .card-grid { margin-top: 28px; }
-.contact-form-heading { width: min(100%, 640px); margin: 72px auto 24px; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.025em; line-height: 1.25; overflow-wrap: anywhere; }
-.contact-form { display: grid; gap: 16px; width: min(100%, 640px); margin: 0 auto; }
+.contact-slide { align-items: flex-start; padding-block: 76px 24px; }
+.contact-form-heading { width: 100%; margin: 0 auto 16px; font-size: clamp(1.125rem, 3vw, 2rem); letter-spacing: -.025em; line-height: 1.25; text-align: center; white-space: nowrap; }
+.contact-form { display: grid; gap: 12px; width: min(100%, 640px); margin: 0 auto; }
 .contact-form label { display: grid; gap: 6px; font-weight: 700; }
 .contact-form input, .contact-form textarea { width: 100%; padding: 10px 12px; border: 1px solid #d9ded5; border-radius: 8px; background: #fffefa; color: #202b27; font: inherit; }
-.contact-form textarea { resize: vertical; }
+.contact-form input { min-height: 44px; padding-block: 8px; }
+.contact-form textarea { min-height: 96px; height: clamp(96px, 14svh, 160px); resize: vertical; }
 .contact-form button { justify-self: start; border: 0; border-radius: 8px; padding: 11px 16px; background: #32664b; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 .contact-form button:hover { background: #28533d; }
 .contact-form button:disabled { cursor: wait; opacity: .7; }
@@ -105,8 +107,8 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
   .presentation .slide { scroll-snap-stop: normal; }
 }
 
-/* Tablet and touch layouts use natural scrolling for content of any height. */
-@media (max-width: 1100px), (pointer: coarse) {
+/* Small and touch viewports use natural scrolling for content of any height. */
+@media (max-width: 1100px), (max-height: 740px), (pointer: coarse) {
   html.presentation-page { scroll-snap-type: none; }
   .presentation .slide { scroll-snap-align: none; scroll-snap-stop: normal; }
 }
