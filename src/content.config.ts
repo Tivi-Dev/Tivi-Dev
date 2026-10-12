@@ -46,6 +46,15 @@ const skills = defineCollection({
   }),
 });
 
+const kontakt = defineCollection({
+  loader: glob({ pattern: 'kontakt.json', base: './src/content' }),
+  schema: z.object({
+    heading: z.string().trim().min(1).default('Schreib mir eine Nachricht'),
+    email: z.string().default(''),
+    phone: z.string().default(''),
+  }),
+});
+
 const aboutTopicSchema = (defaultColor: string, defaultIcon: AboutIconName) => z.object({
   title: z.string(),
   text: z.string().default(''),
@@ -158,4 +167,4 @@ const createCardCollection = (
 const skillCards = createCardCollection('skills', validateSkillCardIcon);
 const projectCards = createCardCollection('projekte');
 
-export const collections = { homepage, skills, ueberMich, legal, privacy, skillCards, projectCards };
+export const collections = { homepage, skills, kontakt, ueberMich, legal, privacy, skillCards, projectCards };

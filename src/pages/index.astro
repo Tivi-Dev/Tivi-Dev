@@ -13,6 +13,8 @@ const aboutPage = aboutEntry.data;
 const homepage = await getEntry('homepage', 'homepage');
 if (!homepage) throw new Error('Die Startseiten-Inhalte fehlen.');
 const skills = await getEntry('skills', 'skills');
+const contactPage = await getEntry('kontakt', 'kontakt');
+const contactHeading = contactPage?.data.heading ?? 'Schreib mir eine Nachricht';
 const skillCards = await getCollection('skillCards');
 const projectCards = await getCollection('projectCards');
 const { title, description, photo, photoAlt, photoSettings, content } = homepage.data;
@@ -96,7 +98,8 @@ const skillSections = skillGroups.map(group => ({
   <section id="kontakt" class="slide text-slide" aria-labelledby="kontakt-title">
     <div>
       <h2 id="kontakt-title" class="page-title">Kontakt</h2>
-      <form class="contact-form" data-contact-form>
+      <h3 id="contact-form-heading" class="contact-form-heading">{contactHeading}</h3>
+      <form class="contact-form" data-contact-form aria-labelledby="contact-form-heading">
         <label>
           <span>Name</span>
           <input name="from_name" type="text" autocomplete="name" required />

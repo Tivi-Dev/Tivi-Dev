@@ -240,6 +240,11 @@ export default config({
       path: 'src/content/kontakt',
       format: { data: 'json' },
       schema: {
+        heading: fields.text({
+          label: 'Überschrift über dem Formular',
+          defaultValue: 'Schreib mir eine Nachricht',
+          validation: { isRequired: true },
+        }),
         email: fields.text({ label: 'E-Mail' }),
         phone: fields.text({ label: 'Telefon' }),
       },

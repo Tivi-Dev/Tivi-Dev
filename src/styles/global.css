@@ -72,7 +72,8 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
 .content-card img { display: block; width: 100%; aspect-ratio: 16 / 10; margin-bottom: 14px; border-radius: 8px; object-fit: cover; }
 .text-slide > div { width: 100%; }
 .text-slide .card-grid { margin-top: 28px; }
-.contact-form { display: grid; gap: 16px; width: min(100%, 640px); margin: 72px auto 0; }
+.contact-form-heading { width: min(100%, 640px); margin: 72px auto 24px; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.025em; line-height: 1.25; overflow-wrap: anywhere; }
+.contact-form { display: grid; gap: 16px; width: min(100%, 640px); margin: 0 auto; }
 .contact-form label { display: grid; gap: 6px; font-weight: 700; }
 .contact-form input, .contact-form textarea { width: 100%; padding: 10px 12px; border: 1px solid #d9ded5; border-radius: 8px; background: #fffefa; color: #202b27; font: inherit; }
 .contact-form textarea { resize: vertical; }
@@ -135,7 +136,7 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
   .skills-slide { display: grid; grid-template-rows: auto repeat(2, minmax(min-content, 1fr)); }
   .skills-area { grid-template-rows: 48px 1fr; }
   .projects-slide .project-cards { padding-top: 0; }
-  .contact-form { margin-top: 0; }
+  .contact-form-heading { margin-top: 0; }
   .contact-form input, .contact-form textarea { min-height: 44px; font-size: 16px; }
   .contact-form button { min-height: 44px; }
   .legal-content { overflow-wrap: anywhere; }
