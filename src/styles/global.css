@@ -1,3 +1,4 @@
+@font-face { font-family: 'Manrope Variable'; font-style: normal; font-weight: 200 800; font-display: swap; src: url('../assets/fonts/Manrope-VariableFont_wght.ttf') format('truetype'); }
 :root { --header-height: 70px; --footer-height: calc(70px + env(safe-area-inset-bottom, 0px)); font-family: 'Manrope Variable', sans-serif; color: #202b27; background: #f7f6f2; line-height: 1.6; font-synthesis: none; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: var(--header-height); }
