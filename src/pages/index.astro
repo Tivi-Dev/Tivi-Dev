@@ -13,6 +13,8 @@ const aboutPage = aboutEntry.data;
 const homepage = await getEntry('homepage', 'homepage');
 if (!homepage) throw new Error('Die Startseiten-Inhalte fehlen.');
 const skills = await getEntry('skills', 'skills');
+const contactPage = await getEntry('kontakt', 'kontakt');
+const contactHeading = contactPage?.data.heading ?? 'Schreib mir eine Nachricht';
 const skillCards = await getCollection('skillCards');
 const projectCards = await getCollection('projectCards');
 const { title, description, photo, photoAlt, photoSettings, content } = homepage.data;
@@ -93,10 +95,11 @@ const skillSections = skillGroups.map(group => ({
       <AboutProfile photo={aboutPage.photo} photoAlt={aboutPage.photoAlt} topics={aboutPage.topics} />
     </div>
   </section>
-  <section id="kontakt" class="slide text-slide" aria-labelledby="kontakt-title">
+  <section id="kontakt" class="slide text-slide contact-slide" aria-labelledby="kontakt-title">
     <div>
       <h2 id="kontakt-title" class="page-title">Kontakt</h2>
-      <form class="contact-form" data-contact-form>
+      <h3 id="contact-form-heading" class="contact-form-heading">{contactHeading}</h3>
+      <form class="contact-form" data-contact-form aria-labelledby="contact-form-heading">
         <label>
           <span>Name</span>
           <input name="from_name" type="text" autocomplete="name" required />
@@ -129,7 +132,7 @@ const skillSections = skillGroups.map(group => ({
     const links = document.querySelectorAll<HTMLAnchorElement>('.site-header nav a');
     const header = document.querySelector<HTMLElement>('.site-header');
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const presentationQuery = window.matchMedia('(min-width: 1101px) and (pointer: fine)');
+    const presentationQuery = window.matchMedia('(min-width: 1101px) and (min-height: 741px) and (pointer: fine)');
     const canUsePresentation = () => presentationQuery.matches && !reducedMotionQuery.matches;
     const initialHash = location.hash;
     let pendingInitialAlignment = Boolean(initialHash);
@@ -252,6 +255,27 @@ const skillSections = skillGroups.map(group => ({
     if (!initialHash) updateActive();
   }
 
+</script>
+
+<script>
+  const contactHeading = document.querySelector<HTMLElement>('.contact-form-heading');
+  if (contactHeading) {
+    const fitHeading = () => {
+      contactHeading.style.removeProperty('font-size');
+      const availableWidth = contactHeading.clientWidth;
+      if (!availableWidth || contactHeading.scrollWidth <= availableWidth) return;
+      const fontSize = Number.parseFloat(getComputedStyle(contactHeading).fontSize);
+      contactHeading.style.fontSize = `${fontSize * availableWidth / (contactHeading.scrollWidth + 1)}px`;
+    };
+    let previousWidth = 0;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width === previousWidth) return;
+      previousWidth = entry.contentRect.width;
+      fitHeading();
+    });
+    observer.observe(contactHeading);
+    void document.fonts.ready.then(fitHeading);
+  }
 </script>
 
 <script>
