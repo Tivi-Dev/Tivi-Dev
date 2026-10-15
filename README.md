@@ -2,7 +2,7 @@
 
 > ### Anwendungsentwickler in Umschulung
 >
-> mit Focus auf Front- Webentwicklung
+> mit Fokus auf Front- Webentwicklung
 
 ---
 
