@@ -1,10 +1,13 @@
 ---
 import '../styles/global.css';
+import { getEntry } from 'astro:content';
 import settings from '../content/settings.json';
 import footer from '../content/footer.json';
 import { withBasePath } from '../lib/site-url';
 interface Props { title: string; description: string; presentation?: boolean }
 const { title, description, presentation = false } = Astro.props;
+const design = (await getEntry('design', 'design'))?.data ?? { glassIntensity: 50, shadowIntensity: 50 };
+const designStyle = `--glass-intensity: ${design.glassIntensity / 100}; --menu-shadow-intensity: ${design.shadowIntensity / 100}`;
 const mainLinks = [
   { label: 'Home', href: '/#home' },
   { label: 'Skills', href: '/#skills' },
@@ -20,7 +23,7 @@ const footerLinks = (footer.links.length ? footer.links : defaultFooterLinks)
   .map(link => ({ ...link, href: withBasePath(link.href) }));
 ---
 <!doctype html>
-<html lang="de" class:list={{ 'presentation-page': presentation }}>
+<html lang="de" class:list={{ 'presentation-page': presentation }} style={designStyle}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

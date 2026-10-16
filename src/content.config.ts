@@ -6,6 +6,14 @@ import { fileURLToPath } from 'node:url';
 import { basename, dirname, resolve } from 'node:path';
 import { glob } from 'astro/loaders';
 
+const design = defineCollection({
+  loader: glob({ pattern: 'design.json', base: './src/content' }),
+  schema: z.object({
+    glassIntensity: z.number().int().min(0).max(100).default(50),
+    shadowIntensity: z.number().int().min(0).max(100).default(50),
+  }),
+});
+
 const homepage = defineCollection({
   loader: glob({ pattern: 'homepage.json', base: './src/content' }),
   schema: z.object({
@@ -167,4 +175,4 @@ const createCardCollection = (
 const skillCards = createCardCollection('skills', validateSkillCardIcon);
 const projectCards = createCardCollection('projekte');
 
-export const collections = { homepage, skills, kontakt, ueberMich, legal, privacy, skillCards, projectCards };
+export const collections = { design, homepage, skills, kontakt, ueberMich, legal, privacy, skillCards, projectCards };

@@ -59,6 +59,25 @@ export default config({
     },
   },
   singletons: {
+    design: singleton({
+      label: 'Design',
+      path: 'src/content/design',
+      format: { data: 'json' },
+      schema: {
+        glassIntensity: fields.integer({
+          label: 'Frosted-Glass-Intensität (%)',
+          description: 'Für Header und Footer. 0 = aus, 50 = bisheriger Entwurf, 100 = maximale Weichzeichnung und Transparenz.',
+          defaultValue: 50,
+          validation: { isRequired: true, min: 0, max: 100 },
+        }),
+        shadowIntensity: fields.integer({
+          label: 'Schlagschatten der Menüpunkte (%)',
+          description: 'Für alle Menütexte im Header, Footer und mobilen Menü. 0 = aus, 50 = bisheriger Entwurf, 100 = kräftiger Schatten.',
+          defaultValue: 50,
+          validation: { isRequired: true, min: 0, max: 100 },
+        }),
+      },
+    }),
     settings: singleton({
       label: 'Header',
       path: 'src/content/settings',
