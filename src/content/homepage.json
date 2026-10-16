@@ -3,6 +3,7 @@
   "description": "test",
   "photo": "/images/homepage/photo.png",
   "photoSettings": {
+    "shadowIntensity": 70,
     "size": 100,
     "aspect": "square",
     "shape": "circle",
@@ -38,7 +39,8 @@
       "italic": false,
       "underline": false,
       "spaceBefore": 0,
-      "spaceAfter": 10
+      "spaceAfter": 10,
+      "shadowIntensity": 70
     },
     {
       "text": "Fokin",
@@ -48,7 +50,8 @@
       "italic": false,
       "underline": false,
       "spaceBefore": 0,
-      "spaceAfter": 30
+      "spaceAfter": 30,
+      "shadowIntensity": 70
     },
     {
       "text": "\"Software sollte man spüren...\"",
