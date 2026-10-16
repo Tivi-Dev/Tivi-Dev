@@ -3,6 +3,7 @@ import { getEntry, render } from 'astro:content';
 import PrivacyBlocks from '../components/PrivacyBlocks.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { withBasePath } from '../lib/site-url';
+import { textShadowStyle } from '../lib/shadows';
 
 export function getStaticPaths() {
   return [
@@ -28,13 +29,13 @@ const Content = legalEntry && hasLegalContent ? (await render(legalEntry)).Conte
 ---
 <BaseLayout title={`${legalTitle} · Meine Website`} description={`${legalTitle} auf dieser Website.`}>
   <section class="hero">
-    <h1 class="legal-page-title">{legalTitle}</h1>
+    <h1 class="legal-page-title" style={textShadowStyle(privacyEntry?.data.titleShadow ?? legalEntry?.data.titleShadow)}>{legalTitle}</h1>
     {privacyEntry ? (
       <PrivacyBlocks blocks={privacyEntry.data.blocks} />
     ) : Content ? (
-      <div class="prose legal-content content-card"><Content /></div>
+      <div class="prose legal-content content-card" style={textShadowStyle(legalEntry?.data.textShadow)}><Content /></div>
     ) : (
-      <p class="intro">
+      <p class="intro" style={textShadowStyle(legalEntry?.data.textShadow)}>
         Es ist noch kein Text hinterlegt. Du kannst ihn in Keystatic unter
         „{legalTitle}“ im Feld „Inhalt“ eintragen.
       </p>

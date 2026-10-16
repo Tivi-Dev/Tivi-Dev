@@ -1,26 +1,29 @@
 ---
 import '../styles/global.css';
 import { getEntry } from 'astro:content';
-import settings from '../content/settings.json';
-import footer from '../content/footer.json';
 import { withBasePath } from '../lib/site-url';
+import { fixedTextShadowRules, textShadowStyle } from '../lib/shadows';
 interface Props { title: string; description: string; presentation?: boolean }
 const { title, description, presentation = false } = Astro.props;
-const design = (await getEntry('design', 'design'))?.data ?? { glassIntensity: 50, shadowIntensity: 50 };
+const settings = (await getEntry('settings', 'settings'))?.data;
+const footer = (await getEntry('footer', 'footer'))?.data;
+if (!settings || !footer) throw new Error('Die Header- oder Footer-Einstellungen fehlen.');
+const design = (await getEntry('design', 'design'))?.data ?? { glassIntensity: 50, shadowIntensity: 50, fixedTextShadows: [] };
 const designStyle = `--glass-intensity: ${design.glassIntensity / 100}; --menu-shadow-intensity: ${design.shadowIntensity / 100}`;
+const shadowRules = fixedTextShadowRules(design.fixedTextShadows);
 const mainLinks = [
   { label: 'Home', href: '/#home' },
   { label: 'Skills', href: '/#skills' },
   { label: 'Projekte', href: '/#projekte' },
   { label: 'Über Mich', href: '/#ueber-mich' },
   { label: 'Kontakt', href: '/#kontakt' },
-].map(link => ({ ...link, href: withBasePath(link.href) }));
+].map(link => ({ ...link, shadowTarget: `menu-${link.href.split('#')[1]}`, href: withBasePath(link.href) }));
 const defaultFooterLinks = [
-  { label: 'Impressum', href: '/impressum/' },
-  { label: 'Datenschutz', href: '/datenschutz/' },
+  { label: 'Impressum', href: '/impressum/', shadowIntensity: null },
+  { label: 'Datenschutz', href: '/datenschutz/', shadowIntensity: null },
 ];
 const footerLinks = (footer.links.length ? footer.links : defaultFooterLinks)
-  .map(link => ({ ...link, href: withBasePath(link.href) }));
+  .map(link => ({ ...link, shadowTarget: ({ '/impressum/': 'footer-impressum', '/datenschutz/': 'footer-datenschutz' } as Record<string, string>)[link.href], href: withBasePath(link.href) }));
 ---
 <!doctype html>
 <html lang="de" class:list={{ 'presentation-page': presentation }} style={designStyle}>
@@ -31,27 +34,28 @@ const footerLinks = (footer.links.length ? footer.links : defaultFooterLinks)
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href={withBasePath('/favicon.svg')} />
     <title>{title}</title>
+    {shadowRules && <style is:inline set:html={shadowRules} />}
   </head>
   <body class:list={{ 'presentation-page': presentation }}>
-    <a class="skip-link" href="#inhalt">Zum Inhalt</a>
+    <a class="skip-link" href="#inhalt" data-shadow-text="skip-link">Zum Inhalt</a>
     <header class="site-header" data-nav-open="false">
-      <a class="site-title" href={withBasePath('/')}>{settings.websiteTitle}</a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">Menü</button>
+      <a class="site-title" href={withBasePath('/')} style={textShadowStyle(settings.titleShadow)}>{settings.websiteTitle}</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-navigation" data-shadow-text="menu-toggle">Menü</button>
       <nav id="main-navigation" class="site-nav" aria-label="Hauptnavigation">
         <ul>
-          {mainLinks.map(({ label, href }) => (
-            <li><a href={href} aria-current={Astro.url.pathname.replace(/\/$/, '') === href.replace(/\/$/, '') ? 'page' : undefined}>{label}</a></li>
+          {mainLinks.map(({ label, href, shadowTarget }) => (
+            <li><a href={href} data-shadow-text={shadowTarget} aria-current={Astro.url.pathname.replace(/\/$/, '') === href.replace(/\/$/, '') ? 'page' : undefined}>{label}</a></li>
           ))}
         </ul>
       </nav>
     </header>
     <main id="inhalt" class:list={{ presentation }} tabindex={presentation ? 0 : undefined} aria-label={presentation ? 'Home bis Kontakt' : undefined}><slot /></main>
     <footer class="site-footer">
-      <span class="footer-label">{footer.label || 'Tivi TM'}</span>
+      <span class="footer-label" style={textShadowStyle(footer.labelShadow)}>{footer.label || 'Tivi TM'}</span>
       <nav class="site-nav" aria-label="Rechtliche Informationen">
         <ul>
-          {footerLinks.map(({ label, href }) => (
-            <li><a href={href} aria-current={Astro.url.pathname.replace(/\/$/, '') === href.replace(/\/$/, '') ? 'page' : undefined}>{label}</a></li>
+          {footerLinks.map(({ label, href, shadowIntensity, shadowTarget }) => (
+            <li><a href={href} data-shadow-text={shadowTarget} style={shadowIntensity == null ? undefined : textShadowStyle(shadowIntensity)} aria-current={Astro.url.pathname.replace(/\/$/, '') === href.replace(/\/$/, '') ? 'page' : undefined}>{label}</a></li>
           ))}
         </ul>
       </nav>

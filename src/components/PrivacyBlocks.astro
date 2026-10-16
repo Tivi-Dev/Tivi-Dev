@@ -1,5 +1,7 @@
 ---
 import Markdoc from '@markdoc/markdoc';
+import { textShadowStyle } from '../lib/shadows';
+import { shadowMarkdocTag } from '../lib/shadow-markdoc';
 
 interface Block {
   article: string;
@@ -9,12 +11,14 @@ interface Block {
   spaceAfter: number;
   headingGap: number;
   paragraphGap: number;
+  shadows: Record<string, number>;
 }
 interface Props { blocks: Block[] }
 const { blocks } = Astro.props;
 const markdocConfig = {
   tags: {
     Unterstrichen: { render: 'u' },
+    Schlagschatten: shadowMarkdocTag,
   },
 };
 const renderText = (text: string) => {
@@ -29,9 +33,9 @@ const renderText = (text: string) => {
 <div class="privacy-blocks prose legal-content content-card">
   {blocks.map((block) => (
     <section class="privacy-block" style={`--box-before: ${block.spaceBefore}px; --box-after: ${block.spaceAfter}px; --heading-gap: ${block.headingGap}px; --paragraph-gap: ${block.paragraphGap}px`}>
-      {block.article.trim() && <h2>{block.article}</h2>}
-      {block.heading.trim() && <h3>{block.heading}</h3>}
-      <div class="privacy-block__text" set:html={renderText(block.text)} />
+      {block.article.trim() && <h2 style={textShadowStyle(block.shadows.article)}>{block.article}</h2>}
+      {block.heading.trim() && <h3 style={textShadowStyle(block.shadows.heading)}>{block.heading}</h3>}
+      <div class="privacy-block__text" style={textShadowStyle(block.shadows.text)} set:html={renderText(block.text)} />
     </section>
   ))}
 </div>

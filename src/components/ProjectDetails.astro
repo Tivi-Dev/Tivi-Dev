@@ -1,45 +1,47 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { withBasePath } from '../lib/site-url';
+import { imageShadowStyle, textShadowStyle } from '../lib/shadows';
 interface Props { card: CollectionEntry<'projectCards'>; dialogId: string }
 const { card, dialogId } = Astro.props;
 const { title, details, description, image, imageAlt, screenshots, projectUrl, author, duration } = card.data;
-const shots = screenshots.length ? screenshots : image ? [{ image, alt: imageAlt, caption: '' }] : [];
+const { shadows } = card.data;
+const shots = screenshots.length ? screenshots : image ? [{ image, alt: imageAlt, caption: '', shadowIntensity: shadows.image, captionShadowIntensity: 0 }] : [];
 const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undefined;
 ---
 <dialog id={dialogId} class="project-dialog" aria-labelledby={`${dialogId}-title`}>
   <div class="project-dialog__layout">
     <header class="project-dialog__header">
-      <h2 id={`${dialogId}-title`}>{title}</h2>
+      <h2 id={`${dialogId}-title`} style={textShadowStyle(shadows.dialogTitle)}>{title}</h2>
       <form method="dialog"><button class="project-dialog__close" type="submit" aria-label="Projektfenster schließen" autofocus>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
       </button></form>
     </header>
     <div class="project-dialog__body">
       <section class="project-dialog__gallery" aria-label={screenshots.length ? 'Screenshots' : 'Projektvorschau'}>
-        <h3>{screenshots.length ? 'Screenshots' : 'Projektvorschau'}</h3>
+        <h3 style={textShadowStyle(shadows.galleryHeading)}>{screenshots.length ? 'Screenshots' : 'Projektvorschau'}</h3>
         {shots.length ? (
           <div>
             {shots.map((shot, index) => <figure class="project-dialog__shot" data-project-shot={index} hidden={index !== 0}>
-              <div class="project-dialog__image"><img src={withBasePath(shot.image)} alt={shot.alt?.trim() || `${title} – ${screenshots.length ? 'Screenshot' : 'Vorschau'} ${index + 1}`} loading="lazy" /></div>
-              {shot.caption && <figcaption>{shot.caption}</figcaption>}
+              <div class="project-dialog__image" style={imageShadowStyle(shot.shadowIntensity)}><img src={withBasePath(shot.image)} alt={shot.alt?.trim() || `${title} – ${screenshots.length ? 'Screenshot' : 'Vorschau'} ${index + 1}`} loading="lazy" /></div>
+              {shot.caption && <figcaption style={textShadowStyle(shot.captionShadowIntensity)}>{shot.caption}</figcaption>}
             </figure>)}
             {shots.length > 1 && <div class="project-dialog__thumbnails" aria-label="Screenshot auswählen">
               {shots.map((shot, index) => <button type="button" data-project-thumbnail={index} aria-pressed={index === 0 ? 'true' : 'false'} aria-label={`Screenshot ${index + 1}${shot.caption ? `: ${shot.caption}` : ''} anzeigen`}>
-                <img src={withBasePath(shot.image)} alt="" loading="lazy" /><span>{index + 1}</span>
+                <img src={withBasePath(shot.image)} alt="" loading="lazy" style={imageShadowStyle(shot.shadowIntensity)} /><span style={textShadowStyle(shadows.screenshotNumber)}>{index + 1}</span>
               </button>)}
             </div>}
           </div>
-        ) : <p class="project-dialog__empty">Für dieses Projekt sind noch keine Screenshots hinterlegt.</p>}
+        ) : <p class="project-dialog__empty" style={textShadowStyle(shadows.emptyGallery)}>Für dieses Projekt sind noch keine Screenshots hinterlegt.</p>}
       </section>
       <section class="project-dialog__description" aria-label="Projektdetails">
-        <h3>Beschreibung</h3>
-        {(details?.trim() || description?.trim()) && <p class="project-dialog__text">{details?.trim() || description}</p>}
+        <h3 style={textShadowStyle(shadows.detailsHeading)}>Beschreibung</h3>
+        {(details?.trim() || description?.trim()) && <p class="project-dialog__text" style={textShadowStyle(shadows.details)}>{details?.trim() || description}</p>}
         {(author || duration) && <dl class="project-dialog__meta">
-          {author && <div><dt>Autor</dt><dd>{author}</dd></div>}
-          {duration && <div><dt>Zeitangabe</dt><dd>{duration}</dd></div>}
+          {author && <div><dt style={textShadowStyle(shadows.authorLabel)}>Autor</dt><dd style={textShadowStyle(shadows.dialogAuthor)}>{author}</dd></div>}
+          {duration && <div><dt style={textShadowStyle(shadows.durationLabel)}>Zeitangabe</dt><dd style={textShadowStyle(shadows.dialogDuration)}>{duration}</dd></div>}
         </dl>}
-        {href && <a class="project-dialog__link" href={href} target="_blank" rel="noopener noreferrer">Zum Projekt <span aria-hidden="true">↗</span></a>}
+        {href && <a class="project-dialog__link" href={href} style={textShadowStyle(shadows.projectLink)} target="_blank" rel="noopener noreferrer">Zum Projekt <span aria-hidden="true">↗</span></a>}
       </section>
     </div>
   </div>
