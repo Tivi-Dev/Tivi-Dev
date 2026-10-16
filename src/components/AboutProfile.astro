@@ -3,16 +3,19 @@ import type { CollectionEntry } from 'astro:content';
 import { aboutIcons } from '../lib/about-icons';
 import Markdoc from '@markdoc/markdoc';
 import { withBasePath } from '../lib/site-url';
+import { imageShadowStyle, textShadowStyle } from '../lib/shadows';
+import { shadowMarkdocTag } from '../lib/shadow-markdoc';
 
 interface Props {
   photo?: string | null;
   photoAlt?: string;
+  photoShadow?: number;
   topics: CollectionEntry<'ueberMich'>['data']['topics'];
 }
-const { photo, photoAlt, topics } = Astro.props;
+const { photo, photoAlt, photoShadow, topics } = Astro.props;
 const entries = ['profile', 'education', 'hobbies', 'skills', 'achievements', 'experience'] as const;
 const lineColors = entries.map((key) => `--line-${key}: ${topics[key].lineColor}`).join('; ');
-const markdocConfig = { tags: { Unterstrichen: { render: 'u' } } };
+const markdocConfig = { tags: { Unterstrichen: { render: 'u' }, Schlagschatten: shadowMarkdocTag } };
 const renderText = (text: string) => {
   const ast = Markdoc.parse(text);
   const errors = Markdoc.validate(ast, markdocConfig);
@@ -31,7 +34,7 @@ const renderText = (text: string) => {
     <path d="M370 334H170" style="stroke: var(--line-hobbies)" />
     <path d="M595 425 730 570H830" style="stroke: var(--line-experience)" />
   </svg>
-  <div class="profile-map__portrait">
+  <div class="profile-map__portrait" style={imageShadowStyle(photoShadow)}>
     {photo ? (
       <img src={withBasePath(photo)} alt={photoAlt ?? ''} width="800" height="800" loading="lazy" />
     ) : (
@@ -42,13 +45,13 @@ const renderText = (text: string) => {
   </div>
   {entries.map((key) => (
     <section class={`profile-map__topic profile-map__topic--${key}`} aria-labelledby={`about-${key}-title`} style={`--topic-line-color: var(--line-${key})`}>
-      <h3 id={`about-${key}-title`}>
+      <h3 id={`about-${key}-title`} style={textShadowStyle(topics[key].shadows.title)}>
         {topics[key].icon !== 'none' && (
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={aboutIcons[topics[key].icon].path} /></svg>
         )}
         {topics[key].title}
       </h3>
-      {topics[key].text.trim() && <div class="profile-map__text" set:html={renderText(topics[key].text)} />}
+      {topics[key].text.trim() && <div class="profile-map__text" style={textShadowStyle(topics[key].shadows.text)} set:html={renderText(topics[key].text)} />}
     </section>
   ))}
 </div>

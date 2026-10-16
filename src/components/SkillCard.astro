@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import '../styles/skill-card.css';
 import { withBasePath } from '../lib/site-url';
+import { imageShadowStyle, textShadowStyle } from '../lib/shadows';
 type SkillCardEntry = CollectionEntry<'skillCards'>;
 interface Props { card: SkillCardEntry }
 const { card } = Astro.props;
@@ -10,7 +11,7 @@ const title = card.data.displayTitle?.trim() || card.data.title;
 const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undefined;
 ---
 <article class:list={['skill-card', { 'skill-card--linked': Boolean(href) }]}>
-  <div class="skill-card__image">
+  <div class="skill-card__image" style={imageShadowStyle(card.data.shadows.image)}>
     {image ? <img src={withBasePath(image)} alt={imageAlt ?? ''} width="440" height="280" loading="lazy" /> : (
       <svg viewBox="0 0 128 128" aria-hidden="true" fill="none" stroke="#242c88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="m25 13 94 21-17 78L8 91Z" fill="#fff" />
@@ -24,5 +25,5 @@ const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undef
       </svg>
     )}
   </div>
-  <h3 class="skill-card__title">{href ? <a href={href}>{title}</a> : title}</h3>
+  <h3 class="skill-card__title" style={textShadowStyle(card.data.shadows.title)}>{href ? <a href={href}>{title}</a> : title}</h3>
 </article>

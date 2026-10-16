@@ -4,6 +4,9 @@ import './src/styles/keystatic-editor.css';
 import { skillGroups } from './src/lib/skill-groups';
 import { aboutTopicsField } from './src/lib/about-schema';
 import { privacySingleton } from './src/lib/privacy-schema';
+import { shadowField, shadowFields } from './src/lib/shadow-fields';
+import { cardShadowLabels, fixedTextShadowTargets } from './src/lib/shadows';
+import { shadowMark } from './src/lib/shadow-mark';
 
 const createCardSchema = (isSkillArea: boolean) => ({
   title: fields.slug({ name: { label: isSkillArea ? 'Kartenkennung (beim Anlegen)' : 'Kartentitel', ...(isSkillArea ? { description: 'Die Kennung wird für Zuordnungen verwendet. Zum Umbenennen den Kartentitel darunter ändern.' } : {}) } }),
@@ -29,15 +32,27 @@ const createCardSchema = (isSkillArea: boolean) => ({
       image: fields.image({ label: 'Screenshot', directory: 'public/images/projects', publicPath: '/images/projects/', validation: { isRequired: true } }),
       alt: fields.text({ label: 'Bildbeschreibung' }),
       caption: fields.text({ label: 'Beschriftung (optional)' }),
+      shadowIntensity: shadowField('Schatten des Screenshots (%)'),
+      captionShadowIntensity: shadowField('Schatten der Beschriftung (%)'),
     }), { label: 'Screenshots', itemLabel: props => props.fields.caption.value || props.fields.alt.value || 'Screenshot' }),
   } : {}),
   projectUrl: fields.url({ label: isSkillArea ? 'Kartenlink (optional)' : 'Link zum Projekt (optional)', description: isSkillArea ? 'Ziel beim Anklicken einer Skill-Karte.' : 'Wird im Projektfenster angezeigt.' }),
+  shadows: shadowFields(isSkillArea ? { title: 'Kartentitel', image: 'Icon' } : cardShadowLabels),
 });
 
 const legalDocumentField = fields.markdoc({
   label: 'Inhalt',
   description: 'Neue Zeile im selben Absatz: Shift+Enter. Leerzeilen und größere Abstände: über „+“ den Block „Leerzeile / Abstand“ einfügen.',
   components: {
+    Schlagschatten: shadowMark,
+    BildMitSchatten: block({
+      label: 'Bild mit Schatten',
+      schema: {
+        image: fields.image({ label: 'Bild', directory: 'public/images/legal', publicPath: '/images/legal/', validation: { isRequired: true } }),
+        alt: fields.text({ label: 'Bildbeschreibung' }),
+        intensity: shadowField('Schlagschatten (%)', 50, true),
+      },
+    }),
     Abstand: block({
       label: 'Leerzeile / Abstand',
       schema: {
@@ -59,6 +74,33 @@ export default config({
     },
   },
   singletons: {
+    design: singleton({
+      label: 'Design',
+      path: 'src/content/design',
+      format: { data: 'json' },
+      schema: {
+        glassIntensity: fields.integer({
+          label: 'Frosted-Glass-Intensität (%)',
+          description: 'Für Header und Footer. 0 = aus, 50 = bisheriger Entwurf, 100 = maximale Weichzeichnung und Transparenz.',
+          defaultValue: 50,
+          validation: { isRequired: true, min: 0, max: 100 },
+        }),
+        shadowIntensity: fields.integer({
+          label: 'Schlagschatten der Menüpunkte (%)',
+          description: 'Für alle Menütexte im Header, Footer und mobilen Menü. 0 = aus, 50 = bisheriger Entwurf, 100 = kräftiger Schatten.',
+          defaultValue: 50,
+          validation: { isRequired: true, min: 0, max: 100 },
+        }),
+        fixedTextShadows: fields.array(fields.object({
+          target: fields.select({ label: 'Text auswählen', options: fixedTextShadowTargets, defaultValue: 'heading-home' }),
+          intensity: shadowField('Schlagschatten (%)', 50, true),
+        }), {
+          label: 'Einzelne Menütexte und feste Beschriftungen',
+          description: 'Einträge für die gewünschten Texte hinzufügen. Diese Werte ersetzen dort den allgemeinen Menüschatten; 0 schaltet ihn für diesen Text aus. Andere Texte und Bilder stellst du direkt bei ihren Inhalten ein.',
+          itemLabel: props => `${fixedTextShadowTargets.find(target => target.value === props.fields.target.value)?.label ?? 'Text'} · ${props.fields.intensity.value ?? 0} %`,
+        }),
+      },
+    }),
     settings: singleton({
       label: 'Header',
       path: 'src/content/settings',
@@ -68,6 +110,7 @@ export default config({
           label: 'Website-Titel im Header',
           validation: { isRequired: true },
         }),
+        titleShadow: shadowField('Schatten des Website-Titels (%)'),
       },
     }),
     homepage: singleton({
@@ -84,6 +127,7 @@ export default config({
         }),
         photoAlt: fields.text({ label: 'Bildbeschreibung', description: 'Beschreibe kurz, was auf dem Foto zu sehen ist.' }),
         photoSettings: fields.object({
+          shadowIntensity: shadowField('Schatten des Fotos (%)'),
           size: fields.integer({
             label: 'Fotogröße (%)',
             description: '100 % nutzt die verfügbare Breite. Kleinere Werte verkleinern das Foto.',
@@ -170,7 +214,8 @@ export default config({
             defaultValue: 16,
             validation: { isRequired: true, min: 0, max: 300 },
           }),
-        }, { layout: [12, 3, 2, 1, 1, 1, 2, 2] }), {
+          shadowIntensity: shadowField(),
+        }, { layout: [12, 3, 2, 1, 1, 1, 2, 2, 12] }), {
           label: 'Seiteninhalt links',
           description: 'Die Einträge zeigen ihren Textinhalt und können per Ziehen neu angeordnet werden.',
           itemLabel: (props) => props.fields.text.value.replace(/\s+/g, ' ').trim() || 'Neue Textzeile',
@@ -186,6 +231,7 @@ export default config({
           label: 'Footer-Label',
           validation: { isRequired: true },
         }),
+        labelShadow: shadowField('Schatten des Footer-Labels (%)'),
         links: fields.array(fields.object({
           label: fields.text({
             label: 'Linktext',
@@ -195,6 +241,11 @@ export default config({
             label: 'Ziel (URL oder Anker)',
             validation: { isRequired: true },
             description: 'Beispiele: /impressum/, /datenschutz/',
+          }),
+          shadowIntensity: fields.integer({
+            label: 'Schlagschatten (%)',
+            description: 'Leer = allgemeinen Menüschatten verwenden. 0 = aus, 100 = kräftig.',
+            validation: { min: 0, max: 100 },
           }),
         }), {
           label: 'Footer-Links',
@@ -232,6 +283,7 @@ export default config({
           publicPath: '/images/ueber-mich/',
         }),
         photoAlt: fields.text({ label: 'Bildbeschreibung Profilfoto' }),
+        photoShadow: shadowField('Schatten des Profilfotos (%)'),
         topics: aboutTopicsField,
       },
     }),
@@ -246,6 +298,7 @@ export default config({
           multiline: false,
           validation: { isRequired: true },
         }),
+        headingShadow: shadowField('Schatten der Formularüberschrift (%)'),
         email: fields.text({ label: 'E-Mail' }),
         phone: fields.text({ label: 'Telefon' }),
       },
@@ -256,6 +309,8 @@ export default config({
       format: { contentField: 'content' },
       schema: {
         title: fields.text({ label: 'Titel', validation: { isRequired: true } }),
+        titleShadow: shadowField('Schatten des Seitentitels (%)'),
+        textShadow: shadowField('Schatten des Inhalts (%)'),
         content: legalDocumentField,
       },
     }),

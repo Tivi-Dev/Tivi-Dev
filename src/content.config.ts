@@ -5,6 +5,40 @@ import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { basename, dirname, resolve } from 'node:path';
 import { glob } from 'astro/loaders';
+import { cardShadowLabels, fixedTextShadowTargets, privacyShadowLabels } from './lib/shadows';
+
+const shadowIntensity = () => z.number().int().min(0).max(100).nullish().transform(value => value ?? 0);
+const shadowGroup = (labels: Record<string, string>) => z.object(
+  Object.fromEntries(Object.keys(labels).map(key => [key, shadowIntensity()])),
+).default(Object.fromEntries(Object.keys(labels).map(key => [key, 0])));
+
+const settings = defineCollection({
+  loader: glob({ pattern: 'settings.json', base: './src/content' }),
+  schema: z.object({ websiteTitle: z.string(), titleShadow: shadowIntensity() }),
+});
+
+const footer = defineCollection({
+  loader: glob({ pattern: 'footer.json', base: './src/content' }),
+  schema: z.object({
+    label: z.string(), labelShadow: shadowIntensity(),
+    links: z.array(z.object({
+      label: z.string(), href: z.string(),
+      shadowIntensity: z.number().int().min(0).max(100).nullish(),
+    })).default([]),
+  }),
+});
+
+const design = defineCollection({
+  loader: glob({ pattern: 'design.json', base: './src/content' }),
+  schema: z.object({
+    glassIntensity: z.number().int().min(0).max(100).default(50),
+    shadowIntensity: z.number().int().min(0).max(100).default(50),
+    fixedTextShadows: z.array(z.object({
+      target: z.string().refine(value => fixedTextShadowTargets.some(target => target.value === value), 'Bitte einen vorhandenen Text auswählen.'),
+      intensity: shadowIntensity(),
+    })).default([]),
+  }),
+});
 
 const homepage = defineCollection({
   loader: glob({ pattern: 'homepage.json', base: './src/content' }),
@@ -20,7 +54,8 @@ const homepage = defineCollection({
       zoom: z.number().int().min(100).max(250).default(100),
       positionX: z.number().int().min(0).max(100).default(50),
       positionY: z.number().int().min(0).max(100).default(50),
-    }).default({ size: 100, aspect: 'portrait', shape: 'rounded', zoom: 100, positionX: 50, positionY: 50 }),
+      shadowIntensity: shadowIntensity(),
+    }).default({ size: 100, aspect: 'portrait', shape: 'rounded', zoom: 100, positionX: 50, positionY: 50, shadowIntensity: 0 }),
     content: z.array(z.object({
       text: z.string(),
       style: z.enum(['heading1', 'heading2', 'heading3', 'paragraph']).default('paragraph'),
@@ -30,6 +65,7 @@ const homepage = defineCollection({
       underline: z.boolean().default(false),
       spaceBefore: z.number().int().min(0).max(300).default(0),
       spaceAfter: z.number().int().min(0).max(300).default(16),
+      shadowIntensity: shadowIntensity(),
     })).default([]),
   }),
 });
@@ -50,6 +86,7 @@ const kontakt = defineCollection({
   loader: glob({ pattern: 'kontakt.json', base: './src/content' }),
   schema: z.object({
     heading: z.string().trim().min(1).default('Schreib mir eine Nachricht'),
+    headingShadow: shadowIntensity(),
     email: z.string().default(''),
     phone: z.string().default(''),
   }),
@@ -60,6 +97,7 @@ const aboutTopicSchema = (defaultColor: string, defaultIcon: AboutIconName) => z
   text: z.string().default(''),
   icon: z.enum(aboutIconNames).default(defaultIcon),
   lineColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Bitte einen Hex-Farbcode mit sechs Zeichen verwenden.').default(defaultColor),
+  shadows: shadowGroup({ title: 'Überschrift', text: 'Text' }),
 });
 
 const ueberMich = defineCollection({
@@ -67,6 +105,7 @@ const ueberMich = defineCollection({
   schema: z.object({
     photo: z.string().nullish(),
     photoAlt: z.string().optional(),
+    photoShadow: shadowIntensity(),
     topics: z.object({
       profile: aboutTopicSchema('#a44c2c', 'person'),
       experience: aboutTopicSchema('#32664b', 'briefcase'),
@@ -80,13 +119,14 @@ const ueberMich = defineCollection({
 
 const legal = defineCollection({
   loader: glob({ pattern: '*.mdoc', base: './src/content/legal' }),
-  schema: z.object({ title: z.string() }),
+  schema: z.object({ title: z.string(), titleShadow: shadowIntensity(), textShadow: shadowIntensity() }),
 });
 
 const privacy = defineCollection({
   loader: glob({ pattern: 'datenschutz.json', base: './src/content/legal' }),
   schema: z.object({
     title: z.string(),
+    titleShadow: shadowIntensity(),
     blocks: z.array(z.object({
       article: z.string().default(''),
       heading: z.string().default(''),
@@ -95,6 +135,7 @@ const privacy = defineCollection({
       spaceAfter: z.number().int().min(0).max(300).default(32),
       headingGap: z.number().int().min(0).max(300).default(12),
       paragraphGap: z.number().int().min(0).max(300).default(10),
+      shadows: shadowGroup(privacyShadowLabels),
     })).default([]),
   }),
 });
@@ -109,8 +150,12 @@ const cardSchema = z.object({
   author: z.string().optional(),
   duration: z.string().optional(),
   details: z.string().optional(),
-  screenshots: z.array(z.object({ image: z.string(), alt: z.string().optional(), caption: z.string().optional() })).default([]),
+  screenshots: z.array(z.object({
+    image: z.string(), alt: z.string().optional(), caption: z.string().optional(),
+    shadowIntensity: shadowIntensity(), captionShadowIntensity: shadowIntensity(),
+  })).default([]),
   projectUrl: z.string().nullish(),
+  shadows: shadowGroup(cardShadowLabels),
 });
 
 function validateSkillCardIcon(data: unknown, filePath: string) {
@@ -167,4 +212,4 @@ const createCardCollection = (
 const skillCards = createCardCollection('skills', validateSkillCardIcon);
 const projectCards = createCardCollection('projekte');
 
-export const collections = { homepage, skills, kontakt, ueberMich, legal, privacy, skillCards, projectCards };
+export const collections = { settings, footer, design, homepage, skills, kontakt, ueberMich, legal, privacy, skillCards, projectCards };

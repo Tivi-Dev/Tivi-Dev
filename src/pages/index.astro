@@ -6,6 +6,7 @@ import SkillCard from '../components/SkillCard.astro';
 import { skillGroups } from '../lib/skill-groups';
 import AboutProfile from '../components/AboutProfile.astro';
 import { withBasePath } from '../lib/site-url';
+import { imageShadowStyle, textShadowStyle } from '../lib/shadows';
 
 const aboutEntry = await getEntry('ueberMich', 'ueber-mich');
 if (!aboutEntry) throw new Error('Die Über-mich-Inhalte fehlen.');
@@ -21,7 +22,7 @@ const { title, description, photo, photoAlt, photoSettings, content } = homepage
 const photoAspect = photoSettings.shape === 'circle' ? '1 / 1'
   : { portrait: '4 / 5', square: '1 / 1', landscape: '4 / 3' }[photoSettings.aspect];
 const photoRadius = { rounded: '16px', rectangle: '0', circle: '50%' }[photoSettings.shape];
-const photoStyle = `--photo-width: ${photoSettings.size}%; --photo-aspect: ${photoAspect}; --photo-radius: ${photoRadius}; --photo-zoom: ${photoSettings.zoom / 100}; --photo-x: ${photoSettings.positionX}%; --photo-y: ${photoSettings.positionY}%`;
+const photoStyle = `--photo-width: ${photoSettings.size}%; --photo-aspect: ${photoAspect}; --photo-radius: ${photoRadius}; --photo-zoom: ${photoSettings.zoom / 100}; --photo-x: ${photoSettings.positionX}%; --photo-y: ${photoSettings.positionY}%; ${imageShadowStyle(photoSettings.shadowIntensity)}`;
 
 const skillCardMap = new Map(skillCards.map(card => [card.id, card]));
 const skillSections = skillGroups.map(group => ({
@@ -38,7 +39,7 @@ const skillSections = skillGroups.map(group => ({
 ---
 <BaseLayout title={title} description={description} presentation>
   <section id="home" class="home-split slide" aria-label="Home">
-    <h2 class="page-title">Home</h2>
+    <h2 class="page-title" data-shadow-text="heading-home">Home</h2>
     <div class="home-text">
       <div class="prose home-content">
         {content.map(line => {
@@ -50,6 +51,7 @@ const skillSections = skillGroups.map(group => ({
             line.bold ? 'font-weight: 800' : '',
             line.italic ? 'font-style: italic' : '',
             line.underline ? 'text-decoration: underline' : '',
+            textShadowStyle(line.shadowIntensity),
           ].filter(Boolean).join('; ');
           if (line.style === 'heading1') return <h1 class={className} style={style}>{line.text}</h1>;
           if (line.style === 'heading2') return <h2 class={className} style={style}>{line.text}</h2>;
@@ -67,12 +69,12 @@ const skillSections = skillGroups.map(group => ({
     </div>
   </section>
   <section id="skills" class="slide skills-slide" aria-labelledby="skills-title">
-    <h2 id="skills-title" class="page-title">Skills</h2>
+    <h2 id="skills-title" class="page-title" data-shadow-text="heading-skills">Skills</h2>
     {(['top', 'bottom'] as const).map(row => (
       <div class="skills-row">
         {skillSections.filter(group => group.row === row).map(group => (
           <section class="skills-area" data-skill-group={group.id} aria-labelledby={`skills-${group.id}-title`}>
-            <h3 id={`skills-${group.id}-title`}>{group.title}</h3>
+            <h3 id={`skills-${group.id}-title`} data-shadow-text={`heading-skills-${group.id}`}>{group.title}</h3>
             <div class="skill-cards">
               {group.cards.map(card => <SkillCard card={card} />)}
             </div>
@@ -83,7 +85,7 @@ const skillSections = skillGroups.map(group => ({
   </section>
   <section id="projekte" class="slide text-slide projects-slide" aria-labelledby="projekte-title">
     <div>
-      <h2 id="projekte-title" class="page-title">Projekte</h2>
+      <h2 id="projekte-title" class="page-title" data-shadow-text="heading-projekte">Projekte</h2>
       <div class="project-cards">
         {projectCards.map(card => <ProjectCard card={card} />)}
       </div>
@@ -91,33 +93,33 @@ const skillSections = skillGroups.map(group => ({
   </section>
   <section id="ueber-mich" class="slide text-slide about-slide" aria-labelledby="ueber-mich-title">
     <div>
-      <h2 id="ueber-mich-title" class="page-title">Über Mich</h2>
-      <AboutProfile photo={aboutPage.photo} photoAlt={aboutPage.photoAlt} topics={aboutPage.topics} />
+      <h2 id="ueber-mich-title" class="page-title" data-shadow-text="heading-ueber-mich">Über Mich</h2>
+      <AboutProfile photo={aboutPage.photo} photoAlt={aboutPage.photoAlt} photoShadow={aboutPage.photoShadow} topics={aboutPage.topics} />
     </div>
   </section>
   <section id="kontakt" class="slide text-slide contact-slide" aria-labelledby="kontakt-title">
     <div>
-      <h2 id="kontakt-title" class="page-title">Kontakt</h2>
-      <h3 id="contact-form-heading" class="contact-form-heading">{contactHeading}</h3>
+      <h2 id="kontakt-title" class="page-title" data-shadow-text="heading-kontakt">Kontakt</h2>
+      <h3 id="contact-form-heading" class="contact-form-heading" style={textShadowStyle(contactPage?.data.headingShadow)}>{contactHeading}</h3>
       <form class="contact-form" data-contact-form aria-labelledby="contact-form-heading">
         <label>
-          <span>Name</span>
-          <input name="from_name" type="text" autocomplete="name" required />
+          <span data-shadow-text="contact-label-name">Name</span>
+          <input name="from_name" type="text" autocomplete="name" data-shadow-text="contact-input-name" required />
         </label>
         <label>
-          <span>E-Mail-Adresse</span>
-          <input name="reply_to" type="email" autocomplete="email" required />
+          <span data-shadow-text="contact-label-email">E-Mail-Adresse</span>
+          <input name="reply_to" type="email" autocomplete="email" data-shadow-text="contact-input-email" required />
         </label>
         <label>
-          <span>Betreff</span>
-          <input name="subject" type="text" required />
+          <span data-shadow-text="contact-label-subject">Betreff</span>
+          <input name="subject" type="text" data-shadow-text="contact-input-subject" required />
         </label>
         <label>
-          <span>Nachricht</span>
-          <textarea name="message" rows="6" required></textarea>
+          <span data-shadow-text="contact-label-message">Nachricht</span>
+          <textarea name="message" rows="6" data-shadow-text="contact-input-message" required></textarea>
         </label>
-        <button type="submit">Nachricht senden</button>
-        <p class="contact-form__status" data-contact-status aria-live="polite"></p>
+        <button type="submit" data-shadow-text="contact-submit">Nachricht senden</button>
+        <p class="contact-form__status" data-contact-status data-shadow-text="contact-status" aria-live="polite"></p>
       </form>
     </div>
   </section>

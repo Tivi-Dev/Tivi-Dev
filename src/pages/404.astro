@@ -4,8 +4,8 @@ import { withBasePath } from '../lib/site-url';
 ---
 <BaseLayout title="Seite nicht gefunden" description="Diese Seite existiert nicht.">
   <section class="hero">
-    <p class="eyebrow">404</p>
-    <h1>Hier ist noch nichts.</h1>
-    <p class="intro"><a href={withBasePath('/')}>Zur Startseite</a></p>
+    <p class="eyebrow" data-shadow-text="not-found-code">404</p>
+    <h1 data-shadow-text="not-found-heading">Hier ist noch nichts.</h1>
+    <p class="intro"><a href={withBasePath('/')} data-shadow-text="not-found-link">Zur Startseite</a></p>
   </section>
 </BaseLayout>

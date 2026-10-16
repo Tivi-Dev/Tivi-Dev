@@ -1,0 +1,6 @@
+---
+import { textShadowStyle } from '../lib/shadows';
+interface Props { intensity?: number }
+const { intensity = 50 } = Astro.props;
+---
+<span style={textShadowStyle(intensity)}><slot /></span>
