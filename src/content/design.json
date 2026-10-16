@@ -1,4 +1,30 @@
 {
-  "glassIntensity": 50,
-  "shadowIntensity": 50
+  "glassIntensity": 70,
+  "shadowIntensity": 70,
+  "fixedTextShadows": [
+    {
+      "target": "heading-home",
+      "intensity": 70
+    },
+    {
+      "target": "heading-skills",
+      "intensity": 70
+    },
+    {
+      "target": "heading-projekte",
+      "intensity": 70
+    },
+    {
+      "target": "heading-ueber-mich",
+      "intensity": 70
+    },
+    {
+      "target": "heading-kontakt",
+      "intensity": 70
+    },
+    {
+      "target": "contact-label-name",
+      "intensity": 50
+    }
+  ]
 }
