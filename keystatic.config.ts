@@ -215,7 +215,7 @@ export default config({
             validation: { isRequired: true, min: 0, max: 300 },
           }),
           shadowIntensity: shadowField(),
-        }, { layout: [12, 3, 2, 1, 1, 1, 2, 2, 3] }), {
+        }, { layout: [12, 3, 2, 1, 1, 1, 2, 2, 12] }), {
           label: 'Seiteninhalt links',
           description: 'Die Einträge zeigen ihren Textinhalt und können per Ziehen neu angeordnet werden.',
           itemLabel: (props) => props.fields.text.value.replace(/\s+/g, ' ').trim() || 'Neue Textzeile',
