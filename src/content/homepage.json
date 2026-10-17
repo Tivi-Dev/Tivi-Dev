@@ -3,13 +3,13 @@
   "description": "test",
   "photo": "/images/homepage/photo.png",
   "photoSettings": {
-    "shadowIntensity": 70,
+    "shadowIntensity": 100,
     "size": 100,
-    "aspect": "square",
+    "aspect": "landscape",
     "shape": "circle",
-    "zoom": 100,
-    "positionX": 3,
-    "positionY": 100
+    "zoom": 110,
+    "positionX": 50,
+    "positionY": 0
   },
   "content": [
     {

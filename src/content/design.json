@@ -25,6 +25,10 @@
     {
       "target": "contact-label-name",
       "intensity": 50
+    },
+    {
+      "target": "heading-skills-frontend",
+      "intensity": 50
     }
   ]
 }
