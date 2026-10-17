@@ -10,20 +10,13 @@ const { image, imageAlt, projectUrl } = card.data;
 const title = card.data.displayTitle?.trim() || card.data.title;
 const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undefined;
 ---
-<article class:list={['skill-card', { 'skill-card--linked': Boolean(href) }]}>
-  <div class="skill-card__image" style={imageShadowStyle(card.data.shadows.image)}>
-    {image ? <img src={withBasePath(image)} alt={imageAlt ?? ''} width="440" height="280" loading="lazy" /> : (
-      <svg viewBox="0 0 128 128" aria-hidden="true" fill="none" stroke="#242c88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="m25 13 94 21-17 78L8 91Z" fill="#fff" />
-        <path d="M13 23h81l17 16v65H13Z" fill="#fff" />
-        <path d="M94 23v16h17" fill="#ffc408" />
-        <path d="M23 35h77v57H23Z" fill="#589fff" />
-        <circle cx="57" cy="53" r="10" fill="#ffc408" stroke="none" />
-        <path d="m24 91 20-31 15 23 19-39 22 47Z" fill="#bc8d66" />
-        <path d="m44 60-8 13 7-1 6 7 4-5Zm34-16L65 70l11-7 11 7Z" fill="#fff" />
-        <path d="m78 44 9 47h13Z" fill="#242c88" opacity=".25" stroke="none" />
+<li class="skill-item">
+  <span class="skill-item__image" style={imageShadowStyle(card.data.shadows.image)}>
+    {image ? <img src={withBasePath(image)} alt={imageAlt ?? ''} width="24" height="24" loading="lazy" /> : (
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m8 8-4 4 4 4m8-8 4 4-4 4M13 4l-2 16" />
       </svg>
     )}
-  </div>
-  <h3 class="skill-card__title" style={textShadowStyle(card.data.shadows.title)}>{href ? <a href={href}>{title}</a> : title}</h3>
-</article>
+  </span>
+  <span class="skill-item__title" style={textShadowStyle(card.data.shadows.title)}>{href ? <a href={href}>{title}</a> : title}</span>
+</li>
