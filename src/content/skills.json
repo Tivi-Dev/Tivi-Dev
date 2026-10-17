@@ -3,7 +3,8 @@
     "html",
     "css",
     "java-script",
-    "tailwind-css"
+    "tailwind-css",
+    "type-script"
   ],
   "cms": [
     "astro",
@@ -11,7 +12,8 @@
   ],
   "design": [
     "canva",
-    "google-stitch"
+    "google-stitch",
+    "figma"
   ],
   "backend": [
     "docker",
@@ -24,6 +26,6 @@
     "visual-studio-code"
   ],
   "databases": [
-    "postgres-sql"
+    "my-sql"
   ]
 }

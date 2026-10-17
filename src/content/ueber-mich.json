@@ -1,42 +1,53 @@
 {
   "photo": "/images/ueber-mich/photo.png",
   "photoAlt": "Tivi",
+  "photoShadow": 70,
   "topics": {
     "profile": {
       "title": "Persönliches Profil",
       "icon": "person",
       "lineColor": "#2596be",
-      "text": "Hi, ich bin Sergey,\n\n31 Jahre alt \\\naus Rheinland - Pfalz\n"
+      "text": "Hi, ich bin Sergey,\\\n31 Jahre alt \\\naus Rheinland - Pfalz\n",
+      "shadows": {
+        "title": 50
+      }
     },
     "education": {
       "title": "Ausbildung",
       "icon": "education",
       "lineColor": "#2596be",
-      "text": "Umschulung zum Fachinformatiker für Anwendungsentwicklung seit Februar 2026\n"
+      "text": "Umschulung zum Fachinformatiker für Anwendungsentwicklung seit Februar 2026\n",
+      "shadows": {}
     },
     "hobbies": {
       "title": "Hobbys",
       "icon": "gamepad",
       "lineColor": "#2596be",
-      "text": "- Sammeln von Filmen und Serien\n- Zeichnen\n- Zocken\n"
+      "text": "- Sammeln von Filmen und Serien\n- Zeichnen\n- Zocken\n",
+      "shadows": {}
     },
     "skills": {
       "title": "Interessen",
       "icon": "code",
       "lineColor": "#005733",
-      "text": "Mein besonderes Interesse gilt der **Frontend-Entwicklung**.\n\nIch gestalte gerne Websites und Benutzeroberflächen, bei denen Aussehen und Bedienung zusammenpassen. Dabei beschäftige ich mich mit klaren Layouts, responsivem Design und den kleinen Details, die eine Anwendung angenehm nutzbar machen.\n"
+      "text": "Mein besonderes Interesse gilt der **Frontend-Entwicklung**.\n\nIch gestalte gerne Websites und Benutzeroberflächen, bei denen Aussehen und Bedienung zusammenpassen. Dabei beschäftige ich mich mit klaren Layouts, responsivem Design und den kleinen Details, die eine Anwendung angenehm nutzbar machen.\n",
+      "shadows": {
+        "title": 50
+      }
     },
     "achievements": {
       "title": "Zertifikate",
       "icon": "trophy",
       "lineColor": "#005733",
-      "text": "[Python-Zertifikat](https://www.freecodecamp.org/certification/tivi-dev/python-v9)\n\n---\n"
+      "text": "[Python-Zertifikat](https://www.freecodecamp.org/certification/tivi-dev/python-v9)\n",
+      "shadows": {}
     },
     "experience": {
       "title": "Skills",
       "icon": "briefcase",
       "lineColor": "#005733",
-      "text": "In eigenen Projekten wie InfraVision und dieser Website probiere ich neue Ideen aus und entwickle meine Fähigkeiten Schritt für Schritt weiter.\n"
+      "text": "In eigenen Projekten wie InfraVision und dieser Website probiere ich neue Ideen aus und entwickle meine Fähigkeiten Schritt für Schritt weiter.\n",
+      "shadows": {}
     }
   }
 }
