@@ -61,9 +61,8 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
 .presentation { width: 100%; }
 .presentation .slide { position: relative; width: min(1080px, calc(100% - 48px)); margin-inline: auto; min-height: calc(100svh - 140px); scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: 0; }
 .text-slide { display: flex; align-items: center; padding-block: 56px; }
-.skills-slide { display: flex; flex-direction: column; justify-content: center; padding-block: 48px; }
+.skills-slide { display: flex; flex-direction: column; justify-content: center; padding-block: 88px 48px; }
 .skills-groups { display: grid; gap: clamp(24px, 4vh, 48px); width: min(100%, 1280px); margin-inline: auto; }
-.skills-slide > .page-title { position: static; margin: 0 0 clamp(24px, 4vh, 40px); text-align: center; }
 .skills-area { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px; align-items: start; min-width: 0; }
 .skills-area > h3 { margin: 0; padding-block: 10px; font-size: .875rem; font-weight: 750; letter-spacing: .035em; line-height: 1.5; text-transform: uppercase; color: #526057; overflow-wrap: anywhere; }
 .skill-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: start; gap: 8px 24px; min-width: 0; margin: 0; padding: 0; list-style: none; }
@@ -190,6 +189,7 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
 
 @media (min-width: 1101px) {
   .presentation .skills-slide { width: min(1320px, calc(100% - 48px)); }
+  .skills-slide > .page-title { left: calc(100px - ((100vw - min(1320px, calc(100vw - 48px))) / 2)); }
 }
 @media (max-width: 440px) {
   .skill-list { grid-template-columns: minmax(0, 1fr); }
