@@ -61,12 +61,12 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
 .presentation { width: 100%; }
 .presentation .slide { position: relative; width: min(1080px, calc(100% - 48px)); margin-inline: auto; min-height: calc(100svh - 140px); scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: 0; }
 .text-slide { display: flex; align-items: center; padding-block: 56px; }
-.skills-slide { padding-block: 88px 48px; }
-.skills-groups { display: grid; gap: clamp(24px, 4vh, 48px); }
-.skills-slide > .page-title { text-align: left; }
-.skills-area { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; align-items: start; min-width: 0; }
+.skills-slide { display: flex; flex-direction: column; justify-content: center; padding-block: 48px; }
+.skills-groups { display: grid; gap: clamp(24px, 4vh, 48px); width: min(100%, 1280px); margin-inline: auto; }
+.skills-slide > .page-title { position: static; margin: 0 0 clamp(24px, 4vh, 40px); text-align: center; }
+.skills-area { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px; align-items: start; min-width: 0; }
 .skills-area > h3 { margin: 0; padding-block: 10px; font-size: .875rem; font-weight: 750; letter-spacing: .035em; line-height: 1.5; text-transform: uppercase; color: #526057; overflow-wrap: anywhere; }
-.skill-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: start; gap: 8px 32px; min-width: 0; margin: 0; padding: 0; list-style: none; }
+.skill-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: start; gap: 8px 24px; min-width: 0; margin: 0; padding: 0; list-style: none; }
 .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 16px; width: 100%; text-align: left; }
 .content-card { min-width: 0; padding: 20px; border: 1px solid #d9ded5; border-radius: 14px; background: #fffefa; }
 .content-card h3 { margin: 0 0 8px; font-size: 1.15rem; }
@@ -138,7 +138,7 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
   .home-line--heading3, .about-line--heading3 { --line-size-cap: 32px; }
   .home-line--paragraph, .about-line--paragraph { --line-size-cap: 24px; }
   .skills-area { grid-template-columns: 160px minmax(0, 1fr); gap: 32px; }
-  .skill-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; }
+  .skill-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .projects-slide .project-cards { padding-top: 0; }
   .contact-form-heading { margin-top: 0; }
   .contact-form input, .contact-form textarea { min-height: 44px; font-size: 16px; }
@@ -162,6 +162,7 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
   .home-line--paragraph, .about-line--paragraph { --line-size-cap: 22px; }
   .skills-area { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .skills-area > h3 { padding-block: 0; }
+  .skill-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .content-card { padding: 16px; }
   .contact-form button { width: 100%; }
 }
@@ -189,7 +190,6 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
 
 @media (min-width: 1101px) {
   .presentation .skills-slide { width: min(1320px, calc(100% - 48px)); }
-  .skills-slide > .page-title { left: calc(100px - ((100vw - min(1320px, calc(100vw - 48px))) / 2)); }
 }
 @media (max-width: 440px) {
   .skill-list { grid-template-columns: minmax(0, 1fr); }
