@@ -1,32 +1,8 @@
 export const skillGroups = [
-  {
-    "id": "frontend",
-    "title": "Frontend",
-    "row": "top"
-  },
-  {
-    "id": "cms",
-    "title": "CMS & Content",
-    "row": "top"
-  },
-  {
-    "id": "design",
-    "title": "UI / UX & Design",
-    "row": "top"
-  },
-  {
-    "id": "backend",
-    "title": "Backend",
-    "row": "bottom"
-  },
-  {
-    "id": "tools",
-    "title": "Tools & Workflow",
-    "row": "bottom"
-  },
-  {
-    "id": "databases",
-    "title": "Datenbanken",
-    "row": "bottom"
-  }
+  { id: 'frontend', title: 'Frontend' },
+  { id: 'backend', title: 'Backend' },
+  { id: 'databases', title: 'Datenbanken' },
+  { id: 'tools', title: 'Tools & Workflow' },
+  { id: 'cms', title: 'CMS & Content' },
+  { id: 'design', title: 'UI / UX & Design' },
 ] as const;

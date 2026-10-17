@@ -70,18 +70,16 @@ const skillSections = skillGroups.map(group => ({
   </section>
   <section id="skills" class="slide skills-slide" aria-labelledby="skills-title">
     <h2 id="skills-title" class="page-title" data-shadow-text="heading-skills">Skills</h2>
-    {(['top', 'bottom'] as const).map(row => (
-      <div class="skills-row">
-        {skillSections.filter(group => group.row === row).map(group => (
-          <section class="skills-area" data-skill-group={group.id} aria-labelledby={`skills-${group.id}-title`}>
-            <h3 id={`skills-${group.id}-title`} data-shadow-text={`heading-skills-${group.id}`}>{group.title}</h3>
-            <div class="skill-cards">
-              {group.cards.map(card => <SkillCard card={card} />)}
-            </div>
-          </section>
-        ))}
-      </div>
-    ))}
+    <div class="skills-groups">
+      {skillSections.map(group => (
+        <section class="skills-area" data-skill-group={group.id} aria-labelledby={`skills-${group.id}-title`}>
+          <h3 id={`skills-${group.id}-title`} data-shadow-text={`heading-skills-${group.id}`}>{group.title}</h3>
+          <ul class="skill-list" role="list" aria-labelledby={`skills-${group.id}-title`}>
+            {group.cards.map(card => <SkillCard card={card} />)}
+          </ul>
+        </section>
+      ))}
+    </div>
   </section>
   <section id="projekte" class="slide text-slide projects-slide" aria-labelledby="projekte-title">
     <div>
