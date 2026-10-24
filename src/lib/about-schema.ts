@@ -8,7 +8,7 @@ const topic = (label: string, defaultIcon: AboutIconName, defaultColor = '#32664
   icon: fields.select({ label: 'Icon', options: aboutIconOptions, defaultValue: defaultIcon }),
   lineColor: fields.text({
     label: 'Linienfarbe',
-    description: 'Farbe der Linien, der Bereichsüberschrift und des Icons. Hex-Farbcode, zum Beispiel #32664b.',
+    description: 'Farbe der Linien, der Bereichsüberschrift und des Icons. Hex-Farbcode, zum Beispiel #32664b. Ist die Farbe für Text zu hell, werden Überschrift und Icon automatisch so weit abgedunkelt, dass sie gut lesbar bleiben (WCAG AA).',
     defaultValue: defaultColor,
     validation: { isRequired: true, pattern: { regex: /^#[0-9a-fA-F]{6}$/, message: 'Bitte einen Hex-Farbcode mit sechs Zeichen eingeben, zum Beispiel #32664b.' } },
   }),

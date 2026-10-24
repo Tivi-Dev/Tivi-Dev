@@ -32,7 +32,8 @@ test('kein fokussiertes Element liegt unter der Kopf- oder einer fixierten Fußl
     await page.keyboard.press('Tab');
     const inMain = await page.evaluate(() => Boolean(document.activeElement?.closest('main')) && document.activeElement?.tagName !== 'MAIN');
     if (!inMain) continue;
-    // Focus scrolling is smooth (scroll-behavior), so wait until the element has come to rest.
+    // Focus scrolling is smooth (scroll-behavior), so wait until the element has come to rest. Under heavy parallel
+    // load Chromium starts that scroll up to ~6 s late (measured), so the window is 10 s; a real overlap never resolves.
     await expect.poll(() => page.evaluate(() => {
       const bounds = document.activeElement!.getBoundingClientRect();
       const header = document.querySelector('.site-header')!.getBoundingClientRect();
@@ -44,7 +45,7 @@ test('kein fokussiertes Element liegt unter der Kopf- oder einer fixierten Fußl
         underHeader: bounds.top < header.bottom - 1,
         underFooter: footerFixed && bounds.bottom > footerTop + 1,
       };
-    }), { timeout: 3_000 }).toMatchObject({ underHeader: false, underFooter: false });
+    }), { timeout: 10_000 }).toMatchObject({ underHeader: false, underFooter: false });
   }
 });
 

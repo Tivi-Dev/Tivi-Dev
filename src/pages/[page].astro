@@ -21,13 +21,15 @@ const page = Astro.params.page ?? '';
 if (['skills', 'projekte', 'ueber-mich', 'kontakt'].includes(page)) {
   return Astro.redirect(withBasePath(`/#${page}`));
 }
+// Same site name as the start page's title, so every browser tab reads "<page> · <site>".
+const siteName = (await getEntry('homepage', 'homepage'))?.data.title.trim() || 'Portfolio';
 const privacyEntry = page === 'datenschutz' ? await getEntry('privacy', 'datenschutz') : null;
 const legalEntry = page === 'datenschutz' ? null : await getEntry('legal', page);
 const legalTitle = privacyEntry?.data.title.trim() || legalEntry?.data.title.trim() || title;
 const hasLegalContent = Boolean(legalEntry?.body?.trim());
 const Content = legalEntry && hasLegalContent ? (await render(legalEntry)).Content : null;
 ---
-<BaseLayout title={`${legalTitle} · Meine Website`} description={`${legalTitle} auf dieser Website.`}>
+<BaseLayout title={`${legalTitle} · ${siteName}`} description={`${legalTitle} auf dieser Website.`}>
   <section class="hero">
     <h1 class="legal-page-title" style={textShadowStyle(privacyEntry?.data.titleShadow ?? legalEntry?.data.titleShadow)}>{legalTitle}</h1>
     {privacyEntry ? (

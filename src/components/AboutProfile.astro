@@ -5,6 +5,7 @@ import Markdoc from '@markdoc/markdoc';
 import { withBasePath } from '../lib/site-url';
 import { imageShadowStyle, textShadowStyle } from '../lib/shadows';
 import { shadowMarkdocTag } from '../lib/shadow-markdoc';
+import { readableHeading } from '../lib/contrast';
 
 interface Props {
   photo?: string | null;
@@ -15,6 +16,9 @@ interface Props {
 const { photo, photoAlt, photoShadow, topics } = Astro.props;
 const entries = ['profile', 'education', 'hobbies', 'skills', 'achievements', 'experience'] as const;
 const lineColors = entries.map((key) => `--line-${key}: ${topics[key].lineColor}`).join('; ');
+// The heading (16px) uses the line colour, darkened where needed for WCAG AA on both topic backgrounds (#f7f6f2 desktop,
+// #fffefa mobile). A heading that needs a correction loses its decorative text shadow, which would darken the backdrop again.
+const titles = Object.fromEntries(entries.map(key => [key, readableHeading(topics[key].lineColor, topics[key].shadows.title, ['#f7f6f2', '#fffefa'], 16, 5)]));
 const markdocConfig = { tags: { Unterstrichen: { render: 'u' }, Schlagschatten: shadowMarkdocTag } };
 const renderText = (text: string) => {
   const ast = Markdoc.parse(text);
@@ -25,6 +29,7 @@ const renderText = (text: string) => {
   return Markdoc.renderers.html(Markdoc.transform(ast, markdocConfig));
 };
 ---
+<!-- The topics are not named regions: they are found through their h3, and a named region would clash with page sections of the same name (e.g. "Skills"). -->
 <div class="profile-map" style={lineColors}>
   <svg class="profile-map__connections" viewBox="0 0 1000 668" preserveAspectRatio="none" fill="none" aria-hidden="true">
     <path d="M410 245 310 145H170" style="stroke: var(--line-profile)" />
@@ -44,8 +49,8 @@ const renderText = (text: string) => {
     )}
   </div>
   {entries.map((key) => (
-    <section class={`profile-map__topic profile-map__topic--${key}`} aria-labelledby={`about-${key}-title`} style={`--topic-line-color: var(--line-${key})`}>
-      <h3 id={`about-${key}-title`} style={textShadowStyle(topics[key].shadows.title)}>
+    <section class={`profile-map__topic profile-map__topic--${key}`} style={`--topic-line-color: var(--line-${key}); --topic-title-color: ${titles[key].color}`}>
+      <h3 id={`about-${key}-title`} style={textShadowStyle(titles[key].shadow ? topics[key].shadows.title : 0)}>
         {topics[key].icon !== 'none' && (
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={aboutIcons[topics[key].icon].path} /></svg>
         )}
@@ -62,7 +67,7 @@ const renderText = (text: string) => {
   .profile-map__portrait img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .profile-map__portrait > svg { width: 100%; height: 100%; padding: 35px; color: #526057; }
   .profile-map__topic { min-width: 0; width: min(100%, 380px); padding: 14px 18px; background: #f7f6f2; border-left: 2px solid var(--topic-line-color, #32664b); overflow-wrap: anywhere; }
-  .profile-map__topic h3 { display: flex; align-items: center; gap: 9px; margin: 0 0 12px; font-size: 1rem; line-height: 1.3; letter-spacing: .035em; text-transform: uppercase; color: var(--topic-line-color, #32664b); }
+  .profile-map__topic h3 { display: flex; align-items: center; gap: 9px; margin: 0 0 12px; font-size: 1rem; line-height: 1.3; letter-spacing: .035em; text-transform: uppercase; color: var(--topic-title-color, #32664b); }
   .profile-map__topic h3 svg { width: 25px; height: 25px; flex-shrink: 0; }
   .profile-map__topic--profile { grid-area: profile; justify-self: start; }
   .profile-map__topic--experience { grid-area: experience; justify-self: end; align-self: end; }
