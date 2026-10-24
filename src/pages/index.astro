@@ -134,58 +134,136 @@ const skillSections = skillGroups.map(group => ({
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const presentationQuery = window.matchMedia('(min-width: 1101px) and (min-height: 741px) and (pointer: fine)');
     const canUsePresentation = () => presentationQuery.matches && !reducedMotionQuery.matches;
-    const initialHash = location.hash;
-    let pendingInitialAlignment = Boolean(initialHash);
+    const slideIndexOf = (hash: string) => slides.findIndex(slide => `#${slide.id}` === hash);
+
+    // Who controls the scroll position right now:
+    // - idle: the user; the scroll listener keeps hash and aria-current in sync,
+    // - aligning: initial alignment to a slide hash after fonts and layout have settled,
+    // - animating: our animated change to a chosen slide,
+    // - following: the browser scrolls to a non-slide fragment or a history entry (e.g. #inhalt, Back).
+    // Every automatic step carries the token it was started with. A newer navigation or any user action
+    // replaces the state, so stale timers and promise callbacks can no longer restore an outdated target.
+    type Navigation =
+      | { mode: 'idle' }
+      | { mode: 'aligning' | 'following'; token: number }
+      | { mode: 'animating'; token: number; target: number };
+    let navigation: Navigation = { mode: 'idle' };
+    let navigationToken = 0;
+    // The hash as last seen or written by this script. If location.hash differs, the browser has navigated
+    // (skip link, Back/Forward) and its hashchange event is still pending, so scroll syncing must wait.
+    let knownHash = location.hash;
+    const isCurrent = (token: number) => navigation.mode !== 'idle' && navigation.token === token;
+
     let frame = 0;
     let currentIndex = 0;
-    let isNavigating = false;
-    let unlockTimer = 0;
+    let finishTimer = 0;
     let wheelDelta = 0;
     let wheelResetTimer = 0;
 
     const getScrollBehavior = (): ScrollBehavior => (reducedMotionQuery.matches ? 'auto' : 'smooth');
-    const scrollToSection = (hash: string, behavior: ScrollBehavior) => {
-      const section = document.querySelector<HTMLElement>(hash);
-      if (!section) return;
-      const top = section.getBoundingClientRect().top + window.scrollY - (header?.offsetHeight ?? 0);
-      window.scrollTo({ top, behavior });
+    // Distance between a slide's top edge and the bottom of the sticky header.
+    const offsetOf = (slide: HTMLElement) => slide.getBoundingClientRect().top - (header?.offsetHeight ?? 0);
+    // A slide counts as reached when it sits below the header, or when the page cannot scroll any further.
+    const isAtSlide = (index: number) => {
+      const offset = offsetOf(slides[index]);
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      return Math.abs(offset) <= 1 || (offset > 0 && window.scrollY >= maxScroll - 1);
     };
-    const goToSlide = (targetIndex: number) => {
-      const nextIndex = Math.max(0, Math.min(targetIndex, slides.length - 1));
-      if (isNavigating) return;
-      currentIndex = nextIndex;
-      isNavigating = true;
-      clearTimeout(unlockTimer);
-      scrollToSection(`#${slides[currentIndex].id}`, getScrollBehavior());
-      unlockTimer = window.setTimeout(() => {
-        isNavigating = false;
-        updateActive();
-      }, reducedMotionQuery.matches ? 80 : 650);
+    const syncLocation = (active: HTMLElement, explicit: boolean) => {
+      const hash = `#${active.id}`;
+      if (location.hash === hash) return;
+      // Without a slide hash (none, #inhalt, unknown) only a deliberate choice of Home may write #home:
+      // an automatic replaceState('#home') would move the sequential focus starting point past the skip link.
+      if (!explicit && active === slides[0] && slideIndexOf(location.hash) < 0) return;
+      history.replaceState(null, '', hash);
+      knownHash = hash;
     };
-    const navigateBy = (offset: number) => {
-      goToSlide(currentIndex + offset);
-    };
-    const updateActive = () => {
-      if (isNavigating) { frame = 0; return; }
+    const updateActive = (sync: 'none' | 'auto' | 'explicit' = 'auto') => {
       const top = header?.getBoundingClientRect().bottom ?? 0;
       const active = slides.find((slide) => {
         const bounds = slide.getBoundingClientRect();
         return bounds.top <= top + 2 && bounds.bottom > top + 2;
       }) ?? slides[0];
-      const index = slides.indexOf(active);
-      if (index >= 0) currentIndex = index;
+      currentIndex = slides.indexOf(active);
       links.forEach(link => {
         if (link.hash === `#${active.id}`) link.setAttribute('aria-current', 'location');
         else link.removeAttribute('aria-current');
       });
-      if (!pendingInitialAlignment && location.hash !== `#${active.id}`) history.replaceState(null, '', `#${active.id}`);
-      frame = 0;
+      if (sync !== 'none' && location.hash === knownHash) syncLocation(active, sync === 'explicit');
+    };
+    // A user action always wins over a pending automatic step; the scroll listener then follows the user.
+    const releaseToUser = () => {
+      if (navigation.mode === 'idle') return;
+      navigation = { mode: 'idle' };
+      clearTimeout(finishTimer);
+      // The action may not scroll at all (e.g. a key without effect); still mark the visible section.
+      if (!frame) frame = requestAnimationFrame(() => {
+        frame = 0;
+        if (navigation.mode === 'idle') updateActive();
+      });
+    };
+    const finishNavigation = (token: number, sync: 'auto' | 'explicit' = 'explicit') => {
+      if (!isCurrent(token)) return;
+      navigation = { mode: 'idle' };
+      clearTimeout(finishTimer);
+      updateActive(sync);
+    };
+    // Animated slide changes and browser-driven scrolls end with the browser's scrollend event. The quiet-period
+    // timer is restarted by every scroll event: a safety net with scrollend, the main signal without it.
+    const quietPeriod = 'onscrollend' in window ? 1000 : 200;
+    const finishWhenScrollSettles = (token: number) => {
+      clearTimeout(finishTimer);
+      finishTimer = window.setTimeout(() => finishNavigation(token, navigation.mode === 'following' ? 'auto' : 'explicit'), quietPeriod);
+    };
+    // Stops a running smooth scroll and holds a slide below the header until the position is stable.
+    // An instant scrollTo cancels the browser's animation, but the compositor may already have moved a few
+    // pixels beyond what scrollY reported, so the position is re-checked and corrected frame by frame.
+    const holdPosition = (index: number, token: number) => {
+      let stableFrames = 0;
+      let frames = 0;
+      const step = () => {
+        if (!isCurrent(token)) return;
+        if (frames === 0 || !isAtSlide(index)) {
+          window.scrollTo({ top: window.scrollY + offsetOf(slides[index]), behavior: 'instant' });
+          stableFrames = 0;
+        } else {
+          stableFrames += 1;
+        }
+        if (stableFrames >= 3 || ++frames > 120) finishNavigation(token);
+        else requestAnimationFrame(step);
+      };
+      step();
+    };
+    // The latest deliberate target wins: a new call replaces or cancels a running scroll animation.
+    const goToSlide = (targetIndex: number) => {
+      currentIndex = Math.max(0, Math.min(targetIndex, slides.length - 1));
+      const token = ++navigationToken;
+      navigation = { mode: 'animating', token, target: currentIndex };
+      clearTimeout(finishTimer);
+      const offset = offsetOf(slides[currentIndex]);
+      // Already at the target (e.g. Skills, then Home within a few ms): an earlier smooth scroll may still be
+      // running without having moved yet, so it must be cancelled instead of simply finishing.
+      if (Math.abs(offset) <= 1) {
+        holdPosition(currentIndex, token);
+        return;
+      }
+      window.scrollTo({ top: window.scrollY + offset, behavior: getScrollBehavior() });
+      finishWhenScrollSettles(token);
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (!canUsePresentation() || event.ctrlKey || event.metaKey || document.querySelector('dialog[open]')) return;
       const target = event.target as HTMLElement | null;
-      if (target?.closest('textarea, input, select, .site-header')) return;
+      if (!canUsePresentation() || event.ctrlKey || event.metaKey || document.querySelector('dialog[open]')
+        || target?.closest('textarea, input, select, .site-header')) {
+        releaseToUser();
+        return;
+      }
+      // Remaining wheel/trackpad inertia of the gesture that already started this slide change.
+      if (navigation.mode === 'animating') {
+        event.preventDefault();
+        return;
+      }
+      releaseToUser();
       const bounds = slides[currentIndex].getBoundingClientRect();
       const footerHeight = document.querySelector<HTMLElement>('.site-footer')?.offsetHeight ?? 0;
       if ((event.deltaY > 0 && bounds.bottom > window.innerHeight - footerHeight + 2)
@@ -195,64 +273,87 @@ const skillSections = skillGroups.map(group => ({
       wheelResetTimer = window.setTimeout(() => { wheelDelta = 0; }, 120);
       if (Math.abs(wheelDelta) < 80) return;
       event.preventDefault();
-      navigateBy(wheelDelta > 0 ? 1 : -1);
+      goToSlide(currentIndex + (wheelDelta > 0 ? 1 : -1));
       wheelDelta = 0;
     };
 
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (!canUsePresentation() || document.querySelector('dialog[open]')) return;
+    const presentationKeyTarget = (event: KeyboardEvent) => {
+      if (!canUsePresentation() || document.querySelector('dialog[open]')) return null;
       const target = event.target as HTMLElement | null;
-      if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(target.tagName))) return;
-
-      if (event.key === 'ArrowDown' || event.key === 'PageDown' || event.key === ' ') {
-        event.preventDefault();
-        navigateBy(1);
-      } else if (event.key === 'ArrowUp' || event.key === 'PageUp') {
-        event.preventDefault();
-        navigateBy(-1);
-      } else if (event.key === 'Home') {
-        event.preventDefault();
-        goToSlide(0);
-      } else if (event.key === 'End') {
-        event.preventDefault();
-        goToSlide(slides.length - 1);
+      if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(target.tagName))) return null;
+      if (event.key === 'ArrowDown' || event.key === 'PageDown' || event.key === ' ') return currentIndex + 1;
+      if (event.key === 'ArrowUp' || event.key === 'PageUp') return currentIndex - 1;
+      if (event.key === 'Home') return 0;
+      if (event.key === 'End') return slides.length - 1;
+      return null;
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      const targetIndex = presentationKeyTarget(event);
+      // Every other key (native scrolling, Tab, Enter on the skip link, …) is a user action.
+      if (targetIndex === null) {
+        releaseToUser();
+        return;
       }
+      event.preventDefault();
+      // A held key must not race through all slides while the animation is still running.
+      if (event.repeat && navigation.mode === 'animating') return;
+      goToSlide(targetIndex);
     };
 
     window.addEventListener('scroll', () => {
-      if (!frame) frame = requestAnimationFrame(updateActive);
+      // Scroll events during an automatic step are programmatic; user input has already released it.
+      if (navigation.mode === 'animating' || navigation.mode === 'following') finishWhenScrollSettles(navigation.token);
+      if (navigation.mode !== 'idle' || frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        if (navigation.mode === 'idle') updateActive();
+      });
     }, { passive: true });
     window.addEventListener('hashchange', () => {
-      const targetIndex = slides.findIndex(slide => `#${slide.id}` === location.hash);
-      if (targetIndex >= 0) goToSlide(targetIndex);
+      knownHash = location.hash;
+      const targetIndex = slideIndexOf(location.hash);
+      if (targetIndex >= 0) {
+        goToSlide(targetIndex);
+        return;
+      }
+      const token = ++navigationToken;
+      navigation = { mode: 'following', token };
+      finishWhenScrollSettles(token);
+    });
+    window.addEventListener('scrollend', () => {
+      // A replaced or cancelled animation may still report its end: only a reached target finishes the current one.
+      if (navigation.mode === 'animating' && isAtSlide(navigation.target)) finishNavigation(navigation.token);
+      else if (navigation.mode === 'following') finishNavigation(navigation.token, 'auto');
     });
     window.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('keydown', onKeyDown);
+    // Mouse, pen and touch (including the start of a touch scroll) are user actions.
+    window.addEventListener('pointerdown', releaseToUser, { passive: true });
 
     links.forEach(link => link.addEventListener('click', event => {
       if (!link.hash || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-      const targetIndex = slides.findIndex(slide => `#${slide.id}` === link.hash);
+      const targetIndex = slideIndexOf(link.hash);
       if (targetIndex < 0) return;
       event.preventDefault();
       goToSlide(targetIndex);
     }));
 
-    if (initialHash) {
-      const targetIndex = slides.findIndex(slide => `#${slide.id}` === initialHash);
-      if (targetIndex >= 0) {
-        currentIndex = targetIndex;
-        const alignInitialSection = () => {
-          scrollToSection(initialHash, 'instant');
-          requestAnimationFrame(() => {
-            pendingInitialAlignment = false;
-            updateActive();
-          });
-        };
-        if (document.readyState === 'complete') void document.fonts.ready.then(alignInitialSection);
-        else window.addEventListener('load', () => { void document.fonts.ready.then(alignInitialSection); }, { once: true });
-      }
+    const initialIndex = slideIndexOf(location.hash);
+    if (initialIndex >= 0) {
+      // Re-align a slide hash once fonts and images have settled the layout, unless the user acted first.
+      currentIndex = initialIndex;
+      const token = ++navigationToken;
+      navigation = { mode: 'aligning', token };
+      // The browser's own fragment scroll may still be animating (scroll-behavior: smooth) and would add its
+      // remaining distance to a single instant scroll, so the position is held frame by frame.
+      const alignInitialSection = () => holdPosition(initialIndex, token);
+      const alignAfterFonts = () => { void document.fonts.ready.then(alignInitialSection, alignInitialSection); };
+      if (document.readyState === 'complete') alignAfterFonts();
+      else window.addEventListener('load', alignAfterFonts, { once: true });
+    } else {
+      // Automatic start-up only marks the active menu entry; it never rewrites the URL.
+      updateActive('none');
     }
-    if (!initialHash) updateActive();
   }
 
 </script>
