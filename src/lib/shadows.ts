@@ -39,11 +39,20 @@ export const cardShadowLabels = {
 
 export const privacyShadowLabels = { article: 'Artikelüberschrift', heading: 'Unterüberschrift', text: 'Text der Box' };
 
-export function shadowValue(intensity: number | null | undefined, image = false) {
+/** Colour (rgb(32 43 39)) and blur of the text shadow; the contrast check in contrast.ts models the same shadow. */
+export const textShadowColor = '#202b27';
+export const textShadowBlur = 4;
+
+/** Opacity of a shadow for a Keystatic intensity (0–100); 0 means no shadow. */
+export const shadowAlpha = (intensity: number | null | undefined) => {
   const value = typeof intensity === 'number' && Number.isFinite(intensity) ? Math.max(0, Math.min(100, intensity)) : 0;
-  if (value === 0) return 'none';
-  const alpha = Number((value * .0048).toFixed(4));
-  return `${image ? '0 4px 8px' : '0 2px 4px'} rgb(32 43 39 / ${alpha})`;
+  return Number((value * .0048).toFixed(4));
+};
+
+export function shadowValue(intensity: number | null | undefined, image = false) {
+  const alpha = shadowAlpha(intensity);
+  if (alpha === 0) return 'none';
+  return `${image ? '0 4px 8px' : `0 2px ${textShadowBlur}px`} rgb(32 43 39 / ${alpha})`;
 }
 
 export const textShadowStyle = (intensity?: number | null) => `text-shadow: ${shadowValue(intensity)}`;

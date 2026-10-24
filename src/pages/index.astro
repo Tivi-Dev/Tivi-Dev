@@ -19,6 +19,23 @@ const contactHeading = contactPage?.data.heading ?? 'Schreib mir eine Nachricht'
 const skillCards = await getCollection('skillCards');
 const projectCards = await getCollection('projectCards');
 const { title, description, photo, photoAlt, photoSettings, content } = homepage.data;
+// Consecutive H1 lines (e.g. "Sergey" and "Fokin") form one heading; every line stays its own block.
+type HomeLine = typeof content[number];
+const homeBlocks = content.reduce<HomeLine[][]>((blocks, line) => {
+  const previous = blocks.at(-1);
+  if (line.style === 'heading1' && previous?.[0].style === 'heading1') previous.push(line);
+  else blocks.push([line]);
+  return blocks;
+}, []);
+const homeLineStyle = (line: HomeLine) => [
+  `--space-before: ${line.spaceBefore}px`,
+  `--space-after: ${line.spaceAfter}px`,
+  line.fontSize ? `--line-font-size: ${line.fontSize}px` : '',
+  line.bold ? 'font-weight: 800' : '',
+  line.italic ? 'font-style: italic' : '',
+  line.underline ? 'text-decoration: underline' : '',
+  textShadowStyle(line.shadowIntensity),
+].filter(Boolean).join('; ');
 const photoAspect = photoSettings.shape === 'circle' ? '1 / 1'
   : { portrait: '4 / 5', square: '1 / 1', landscape: '4 / 3' }[photoSettings.aspect];
 const photoRadius = { rounded: '16px', rectangle: '0', circle: '50%' }[photoSettings.shape];
@@ -39,24 +56,19 @@ const skillSections = skillGroups.map(group => ({
 ---
 <BaseLayout title={title} description={description} presentation>
   <section id="home" class="home-split slide" aria-label="Home">
-    <h2 class="page-title" data-shadow-text="heading-home">Home</h2>
+    <p class="page-title" data-shadow-text="heading-home">Home</p>
     <div class="home-text">
       <div class="prose home-content">
-        {content.map(line => {
-          const className = `home-line home-line--${line.style}`;
-          const style = [
-            `--space-before: ${line.spaceBefore}px`,
-            `--space-after: ${line.spaceAfter}px`,
-            line.fontSize ? `--line-font-size: ${line.fontSize}px` : '',
-            line.bold ? 'font-weight: 800' : '',
-            line.italic ? 'font-style: italic' : '',
-            line.underline ? 'text-decoration: underline' : '',
-            textShadowStyle(line.shadowIntensity),
-          ].filter(Boolean).join('; ');
-          if (line.style === 'heading1') return <h1 class={className} style={style}>{line.text}</h1>;
-          if (line.style === 'heading2') return <h2 class={className} style={style}>{line.text}</h2>;
-          if (line.style === 'heading3') return <h3 class={className} style={style}>{line.text}</h3>;
-          return <p class={className} style={style}>{line.text}</p>;
+        {homeBlocks.map(lines => {
+          const [line] = lines;
+          // The name is the page's only h1; the space keeps "Sergey Fokin" as two words for screen readers.
+          if (line.style === 'heading1') return (
+            <h1 class="home-name">
+              {lines.map((nameLine, index) => <>{index > 0 && ' '}<span class={`home-line home-line--${nameLine.style}`} style={homeLineStyle(nameLine)}>{nameLine.text}</span></>)}
+            </h1>
+          );
+          // H2/H3 in the intro are only text sizes (such as the motto); as headings they would open empty sections.
+          return <p class={`home-line home-line--${line.style}`} style={homeLineStyle(line)}>{line.text}</p>;
         })}
       </div>
     </div>
@@ -356,27 +368,6 @@ const skillSections = skillGroups.map(group => ({
     }
   }
 
-</script>
-
-<script>
-  const contactHeading = document.querySelector<HTMLElement>('.contact-form-heading');
-  if (contactHeading) {
-    const fitHeading = () => {
-      contactHeading.style.removeProperty('font-size');
-      const availableWidth = contactHeading.clientWidth;
-      if (!availableWidth || contactHeading.scrollWidth <= availableWidth) return;
-      const fontSize = Number.parseFloat(getComputedStyle(contactHeading).fontSize);
-      contactHeading.style.fontSize = `${fontSize * availableWidth / (contactHeading.scrollWidth + 1)}px`;
-    };
-    let previousWidth = 0;
-    const observer = new ResizeObserver(([entry]) => {
-      if (entry.contentRect.width === previousWidth) return;
-      previousWidth = entry.contentRect.width;
-      fitHeading();
-    });
-    observer.observe(contactHeading);
-    void document.fonts.ready.then(fitHeading);
-  }
 </script>
 
 <script>
