@@ -12,7 +12,7 @@ const dialogId = `project-dialog-${card.id}`;
 <article class="project-card" data-project-card aria-label={title}>
   <div class="project-card__image-space" aria-hidden="true"></div>
   <div class="project-card__image" style={imageShadowStyle(shadows.image)}>
-    {image ? <img src={withBasePath(image)} alt={imageAlt ?? ''} loading="lazy" width="640" height="470" /> : (
+    {image ? <img src={withBasePath(image)} alt={imageAlt?.trim() ?? ''} loading="lazy" width="640" height="470" /> : (
       <div class="project-card__placeholder" aria-hidden="true"><span>&lt;/&gt;</span></div>
     )}
   </div>

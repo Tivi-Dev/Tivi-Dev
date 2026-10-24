@@ -95,4 +95,14 @@ const footerLinks = (footer.links.length ? footer.links : defaultFooterLinks)
       document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
     }).observe(header);
   }
+  // Mobile browsers scroll a focused text field only until the caret is visible and ignore scroll-padding,
+  // so the fixed footer could still cover the rest of the field. scrollIntoView honours scroll-padding.
+  // Same media query as scroll-padding-bottom in global.css: on desktop, scroll snapping would fight this scroll.
+  const footerPaddingQuery = window.matchMedia('(max-width: 1100px), (max-height: 740px), (pointer: coarse)');
+  document.addEventListener('focusin', (event) => {
+    const field = event.target;
+    if (!footerPaddingQuery.matches) return;
+    if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement)) return;
+    requestAnimationFrame(() => field.scrollIntoView({ block: 'nearest' }));
+  });
 </script>

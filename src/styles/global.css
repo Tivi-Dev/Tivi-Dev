@@ -111,6 +111,7 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
 
 /* Small and touch viewports use natural scrolling for content of any height. */
 @media (max-width: 1100px), (max-height: 740px), (pointer: coarse) {
+  html { scroll-padding-bottom: var(--footer-height); }
   html.presentation-page { scroll-snap-type: none; }
   .presentation .slide { scroll-snap-align: none; scroll-snap-stop: normal; }
 }
@@ -194,4 +195,10 @@ h1 { font-size: clamp(2.8rem, 7vw, 6rem); letter-spacing: -.055em; line-height: 
 }
 @media (max-width: 440px) {
   .skill-list { grid-template-columns: minmax(0, 1fr); }
+}
+/* On very low viewports (e.g. phones in landscape) a fixed footer would cover too much content. */
+@media (max-height: 500px) {
+  html { scroll-padding-bottom: 0; }
+  body { padding-bottom: 0; }
+  .site-footer { position: static; }
 }
