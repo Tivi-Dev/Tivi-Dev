@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import '../styles/skill-card.css';
-import { withBasePath } from '../lib/site-url';
+import ResponsiveImage from './ResponsiveImage.astro';
 import { imageShadowStyle, textShadowStyle } from '../lib/shadows';
 type SkillCardEntry = CollectionEntry<'skillCards'>;
 interface Props { card: SkillCardEntry }
@@ -12,7 +12,7 @@ const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undef
 ---
 <li class="skill-item">
   <span class="skill-item__image" style={imageShadowStyle(card.data.shadows.image)}>
-    {image ? <img src={withBasePath(image)} alt={imageAlt ?? ''} width="24" height="24" loading="lazy" /> : (
+    {image ? <ResponsiveImage src={image} alt={imageAlt ?? ''} sizes="24px" width="24" height="24" loading="lazy" /> : (
       <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="m8 8-4 4 4 4m8-8 4 4-4 4M13 4l-2 16" />
       </svg>

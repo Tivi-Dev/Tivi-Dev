@@ -2,10 +2,11 @@
 import type { CollectionEntry } from 'astro:content';
 import { aboutIcons } from '../lib/about-icons';
 import Markdoc from '@markdoc/markdoc';
-import { withBasePath } from '../lib/site-url';
 import { imageShadowStyle, textShadowStyle } from '../lib/shadows';
 import { shadowMarkdocTag } from '../lib/shadow-markdoc';
 import { readableHeading } from '../lib/contrast';
+import ResponsiveImage from './ResponsiveImage.astro';
+import { coverScale, publicImageSize } from '../lib/responsive-images';
 
 interface Props {
   photo?: string | null;
@@ -19,6 +20,8 @@ const lineColors = entries.map((key) => `--line-${key}: ${topics[key].lineColor}
 // The heading (16px) uses the line colour, darkened where needed for WCAG AA on both topic backgrounds (#f7f6f2 desktop,
 // #fffefa mobile). A heading that needs a correction loses its decorative text shadow, which would darken the backdrop again.
 const titles = Object.fromEntries(entries.map(key => [key, readableHeading(topics[key].lineColor, topics[key].shadows.title, ['#f7f6f2', '#fffefa'], 16, 5)]));
+// Round portrait (object-fit: cover) in a box of min(260px, 70vw).
+const portraitScale = photo ? coverScale(await publicImageSize(photo), 1) : 1;
 const markdocConfig = { tags: { Unterstrichen: { render: 'u' }, Schlagschatten: shadowMarkdocTag } };
 const renderText = (text: string) => {
   const ast = Markdoc.parse(text);
@@ -41,7 +44,7 @@ const renderText = (text: string) => {
   </svg>
   <div class="profile-map__portrait" style={imageShadowStyle(photoShadow)}>
     {photo ? (
-      <img src={withBasePath(photo)} alt={photoAlt ?? ''} width="800" height="800" loading="lazy" />
+      <ResponsiveImage src={photo} alt={photoAlt ?? ''} sizes={`calc(min(260px, 70vw) * ${portraitScale})`} loading="lazy" />
     ) : (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
         <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 21v-2a7 7 0 0 1 14 0v2" />
