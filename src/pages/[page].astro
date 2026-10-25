@@ -28,8 +28,11 @@ const legalEntry = page === 'datenschutz' ? null : await getEntry('legal', page)
 const legalTitle = privacyEntry?.data.title.trim() || legalEntry?.data.title.trim() || title;
 const hasLegalContent = Boolean(legalEntry?.body?.trim());
 const Content = legalEntry && hasLegalContent ? (await render(legalEntry)).Content : null;
+const description = page === 'datenschutz'
+  ? `${legalTitle} von ${siteName}: welche Daten beim Besuch und bei der Kontaktaufnahme verarbeitet werden und welche Rechte Sie haben.`
+  : `${legalTitle} von ${siteName}: Angaben zum Anbieter dieser Website und Kontaktmöglichkeit.`;
 ---
-<BaseLayout title={`${legalTitle} · ${siteName}`} description={`${legalTitle} auf dieser Website.`}>
+<BaseLayout title={`${legalTitle} · ${siteName}`} description={description}>
   <section class="hero">
     <h1 class="legal-page-title" style={textShadowStyle(privacyEntry?.data.titleShadow ?? legalEntry?.data.titleShadow)}>{legalTitle}</h1>
     {privacyEntry ? (

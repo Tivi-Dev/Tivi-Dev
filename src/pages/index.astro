@@ -8,6 +8,7 @@ import AboutProfile from '../components/AboutProfile.astro';
 import ResponsiveImage from '../components/ResponsiveImage.astro';
 import { coverScale, publicImageSize } from '../lib/responsive-images';
 import { imageShadowStyle, textShadowStyle } from '../lib/shadows';
+import { absoluteUrl } from '../lib/site-url';
 
 const aboutEntry = await getEntry('ueberMich', 'ueber-mich');
 if (!aboutEntry) throw new Error('Die Über-mich-Inhalte fehlen.');
@@ -59,8 +60,16 @@ const skillSections = skillGroups.map(group => ({
     return [card];
   }),
 }));
+// Structured data only states what the page itself shows: the person named in the H1 lines and their photo.
+const personName = content.filter(line => line.style === 'heading1').map(line => line.text.trim()).filter(Boolean).join(' ');
+const structuredData = personName ? {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  url: new URL(Astro.url.pathname, Astro.site).href,
+  mainEntity: { '@type': 'Person', name: personName, ...(photo ? { image: absoluteUrl(photo) } : {}) },
+} : undefined;
 ---
-<BaseLayout title={title} description={description} presentation>
+<BaseLayout title={title} description={description} presentation structuredData={structuredData}>
   <section id="home" class="home-split slide" aria-label="Home">
     <p class="page-title" data-shadow-text="heading-home">Home</p>
     <div class="home-text">
