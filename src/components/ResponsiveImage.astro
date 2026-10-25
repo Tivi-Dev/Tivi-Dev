@@ -1,0 +1,27 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { isOptimizable, publicImageSize, variantFormats, variantPath, variantWidths } from '../lib/responsive-images';
+import { withBasePath } from '../lib/site-url';
+
+/**
+ * <img> for an image from public/images (Keystatic). In the production build it becomes a <picture> with AVIF and WebP
+ * variants (see responsive-images.ts); the original file stays the fallback. `sizes` is the rendered width of the image.
+ * Without `width`/`height` the image's own pixel size is used, so the browser can reserve its space before loading.
+ */
+interface Props extends Omit<HTMLAttributes<'img'>, 'src' | 'srcset'> { src: string; sizes: string }
+const { src, sizes, width, height, ...attributes } = Astro.props;
+const size = isOptimizable(src) ? await publicImageSize(src) : null;
+const sources = import.meta.env.PROD && size
+  ? variantFormats.map(format => ({
+    type: `image/${format}`,
+    srcset: variantWidths(size.width).map(variantWidth => `${withBasePath(variantPath(src, variantWidth, format))} ${variantWidth}w`).join(', '),
+  }))
+  : [];
+const image = { src: withBasePath(src), width: width ?? size?.width, height: height ?? size?.height, ...attributes };
+---
+{sources.length ? (
+  <picture>
+    {sources.map(source => <source type={source.type} srcset={source.srcset} sizes={sizes} />)}
+    <img {...image} />
+  </picture>
+) : <img {...image} />}

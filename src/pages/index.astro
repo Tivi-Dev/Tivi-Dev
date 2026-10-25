@@ -5,7 +5,8 @@ import ProjectCard from '../components/ProjectCard.astro';
 import SkillCard from '../components/SkillCard.astro';
 import { skillGroups } from '../lib/skill-groups';
 import AboutProfile from '../components/AboutProfile.astro';
-import { withBasePath } from '../lib/site-url';
+import ResponsiveImage from '../components/ResponsiveImage.astro';
+import { coverScale, publicImageSize } from '../lib/responsive-images';
 import { imageShadowStyle, textShadowStyle } from '../lib/shadows';
 
 const aboutEntry = await getEntry('ueberMich', 'ueber-mich');
@@ -39,6 +40,11 @@ const homeLineStyle = (line: HomeLine) => [
 const photoAspect = photoSettings.shape === 'circle' ? '1 / 1'
   : { portrait: '4 / 5', square: '1 / 1', landscape: '4 / 3' }[photoSettings.aspect];
 const photoRadius = { rounded: '16px', rectangle: '0', circle: '50%' }[photoSettings.shape];
+// The photo is drawn with object-fit: cover and zoom, so it needs more pixels than its box is wide. Box widths: up to
+// 400px below 760px viewport width, otherwise half of the slide (max. 540px).
+const [aspectWidth, aspectHeight] = photoAspect.split('/').map(Number);
+const photoScale = photo ? coverScale(await publicImageSize(photo), aspectWidth / aspectHeight, photoSettings.zoom / 100) : 1;
+const photoSizes = `(max-width: 760px) calc(min(100vw - 32px, 400px) * ${photoScale}), calc(min(50vw, 540px) * ${photoScale})`;
 const photoStyle = `--photo-width: ${photoSettings.size}%; --photo-aspect: ${photoAspect}; --photo-radius: ${photoRadius}; --photo-zoom: ${photoSettings.zoom / 100}; --photo-x: ${photoSettings.positionX}%; --photo-y: ${photoSettings.positionY}%; ${imageShadowStyle(photoSettings.shadowIntensity)}`;
 
 const skillCardMap = new Map(skillCards.map(card => [card.id, card]));
@@ -74,7 +80,7 @@ const skillSections = skillGroups.map(group => ({
     </div>
     <div class="home-photo" style={photoStyle}>
       {photo ? (
-        <img src={withBasePath(photo)} alt={photoAlt ?? ''} width="800" height="1000" fetchpriority="high" />
+        <ResponsiveImage src={photo} alt={photoAlt ?? ''} sizes={photoSizes} fetchpriority="high" />
       ) : (
         <div class="photo-placeholder" aria-hidden="true"></div>
       )}

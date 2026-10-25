@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { getEntry } from 'astro:content';
 import { withBasePath } from '../lib/site-url';
 import { fixedTextShadowRules, textShadowStyle } from '../lib/shadows';
+import fontUrl from '../assets/fonts/Manrope-VariableFont_wght.woff2?url';
 interface Props { title: string; description: string; presentation?: boolean }
 const { title, description, presentation = false } = Astro.props;
 const settings = (await getEntry('settings', 'settings'))?.data;
@@ -29,9 +30,12 @@ const footerLinks = (footer.links.length ? footer.links : defaultFooterLinks)
 <html lang="de" class:list={{ 'presentation-page': presentation }} style={designStyle}>
   <head>
     <meta charset="UTF-8" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    <!-- Same file as the @font-face in global.css: loading it early keeps the text from reflowing late. -->
+    <link rel="preload" href={fontUrl} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href={withBasePath('/favicon.svg')} />
     <title>{title}</title>
     {shadowRules && <style is:inline set:html={shadowRules} />}
@@ -90,7 +94,6 @@ const footerLinks = (footer.links.length ? footer.links : defaultFooterLinks)
       if (!header.contains(event.target as Node)) closeMenu();
     });
     window.matchMedia('(max-width: 1100px)').addEventListener('change', closeMenu);
-    header.classList.add('navigation-ready');
     new ResizeObserver(() => {
       document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
     }).observe(header);

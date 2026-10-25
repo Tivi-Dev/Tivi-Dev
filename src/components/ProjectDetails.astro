@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { withBasePath } from '../lib/site-url';
+import ResponsiveImage from './ResponsiveImage.astro';
 import { imageShadowStyle, textShadowStyle } from '../lib/shadows';
 interface Props { card: CollectionEntry<'projectCards'>; dialogId: string }
 const { card, dialogId } = Astro.props;
@@ -23,12 +23,12 @@ const href = projectUrl && /^https?:\/\//i.test(projectUrl) ? projectUrl : undef
         {shots.length ? (
           <div>
             {shots.map((shot, index) => <figure class="project-dialog__shot" data-project-shot={index} hidden={index !== 0}>
-              <div class="project-dialog__image" style={imageShadowStyle(shot.shadowIntensity)}><img src={withBasePath(shot.image)} alt={shot.alt?.trim() || `${title} – ${screenshots.length ? 'Screenshot' : 'Vorschau'} ${index + 1}`} loading="lazy" /></div>
+              <div class="project-dialog__image" style={imageShadowStyle(shot.shadowIntensity)}><ResponsiveImage src={shot.image} alt={shot.alt?.trim() || `${title} – ${screenshots.length ? 'Screenshot' : 'Vorschau'} ${index + 1}`} sizes="(max-width: 760px) calc(100vw - 64px), 640px" loading="lazy" /></div>
               {shot.caption && <figcaption style={textShadowStyle(shot.captionShadowIntensity)}>{shot.caption}</figcaption>}
             </figure>)}
             {shots.length > 1 && <div class="project-dialog__thumbnails" aria-label="Screenshot auswählen">
               {shots.map((shot, index) => <button type="button" data-project-thumbnail={index} aria-pressed={index === 0 ? 'true' : 'false'} aria-label={`Screenshot ${index + 1}${shot.caption ? `: ${shot.caption}` : ''} anzeigen`}>
-                <img src={withBasePath(shot.image)} alt="" loading="lazy" style={imageShadowStyle(shot.shadowIntensity)} /><span style={textShadowStyle(shadows.screenshotNumber)}>{index + 1}</span>
+                <ResponsiveImage src={shot.image} alt="" sizes="88px" loading="lazy" style={imageShadowStyle(shot.shadowIntensity)} /><span style={textShadowStyle(shadows.screenshotNumber)}>{index + 1}</span>
               </button>)}
             </div>}
           </div>

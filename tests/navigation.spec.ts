@@ -89,6 +89,9 @@ const gotoWithHeldFont = async (page: Page, hash: string) => {
     const headerBottom = document.querySelector('.site-header')!.getBoundingClientRect().bottom;
     return Boolean(section) && Math.abs(section!.getBoundingClientRect().top - headerBottom) <= 5;
   }, hash);
+  // That scroll is smooth (scroll-behavior) and still creeps the last pixels; Chromium drops wheel input that
+  // arrives during it, even with the page's scripts blocked. The visitor acts once it has come to rest.
+  await waitForScrollRest(page);
   // Proof that the critical action below happens before the initial alignment can run.
   expect(await page.evaluate(() => document.fonts.status)).toBe('loading');
   return async () => {
