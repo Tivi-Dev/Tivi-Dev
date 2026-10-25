@@ -5,6 +5,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { basename, dirname, resolve } from 'node:path';
 import { glob } from 'astro/loaders';
+import { metaDescriptionSchema } from './lib/meta-description';
 import { cardShadowLabels, fixedTextShadowTargets, privacyShadowLabels } from './lib/shadows';
 
 const shadowIntensity = () => z.number().int().min(0).max(100).nullish().transform(value => value ?? 0);
@@ -44,7 +45,7 @@ const homepage = defineCollection({
   loader: glob({ pattern: 'homepage.json', base: './src/content' }),
   schema: z.object({
     title: z.string(),
-    description: z.string(),
+    description: metaDescriptionSchema,
     photo: z.string().nullish(),
     photoAlt: z.string().optional(),
     photoSettings: z.object({

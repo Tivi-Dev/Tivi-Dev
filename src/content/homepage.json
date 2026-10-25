@@ -1,6 +1,7 @@
 {
   "title": "Tivi-Dev Portfolio",
-  "description": "test",
+  "description": "Portfolio von Sergey Fokin, Anwendungsentwickler in Umschulung mit Fokus auf Frontend und Webentwicklung: Skills, Projekte und Kontakt.",
+  "photoAlt": "Porträt von Sergey Fokin als Schwarz-Weiß-Zeichnung",
   "photo": "/images/homepage/photo.png",
   "photoSettings": {
     "shadowIntensity": 100,

@@ -6,3 +6,6 @@ export function withBasePath(path: string): string {
     || path.startsWith(`${base}?`) || path.startsWith(`${base}#`)) return path;
   return `${base}${path}`;
 }
+
+/** Absolute public URL (`site` + base path), e.g. for canonical links, Open Graph and the sitemap. */
+export const absoluteUrl = (path: string) => new URL(withBasePath(path), import.meta.env.SITE).href;

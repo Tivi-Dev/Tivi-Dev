@@ -7,6 +7,7 @@ import { privacySingleton } from './src/lib/privacy-schema';
 import { shadowField, shadowFields } from './src/lib/shadow-fields';
 import { cardShadowLabels, fixedTextShadowTargets } from './src/lib/shadows';
 import { shadowMark } from './src/lib/shadow-mark';
+import { metaDescriptionField } from './src/lib/meta-description-field';
 
 const createCardSchema = (isSkillArea: boolean) => ({
   title: fields.slug({ name: { label: isSkillArea ? 'Kartenkennung (beim Anlegen)' : 'Kartentitel', ...(isSkillArea ? { description: 'Die Kennung wird für Zuordnungen verwendet. Zum Umbenennen den Kartentitel darunter ändern.' } : {}) } }),
@@ -119,13 +120,13 @@ export default config({
       format: { data: 'json' },
       schema: {
         title: fields.text({ label: 'Seitentitel', validation: { isRequired: true } }),
-        description: fields.text({ label: 'Beschreibung für Suchmaschinen', multiline: true, validation: { isRequired: true } }),
+        description: metaDescriptionField,
         photo: fields.image({
           label: 'Foto rechts',
           directory: 'public/images/homepage',
           publicPath: '/images/homepage/',
         }),
-        photoAlt: fields.text({ label: 'Bildbeschreibung', description: 'Beschreibe kurz, was auf dem Foto zu sehen ist.' }),
+        photoAlt: fields.text({ label: 'Bildbeschreibung', description: 'Beschreibe kurz, was auf dem Foto zu sehen ist. Wird auch für das Vorschaubild in Link-Vorschauen verwendet.' }),
         photoSettings: fields.object({
           shadowIntensity: shadowField('Schatten des Fotos (%)'),
           size: fields.integer({
